@@ -42,4 +42,6 @@ def load_and_preprocess_data():
     # Ensure test data has the same feature columns as training data
     X_test = X_test.reindex(columns=X.columns, fill_value=0)
 
-    return X_train, X_val, y_train, y_val, X_test
+    result = (X_train, X_val, y_train, y_val)
+    print(f"Number of items being returned: {len(result)}")
+    return result

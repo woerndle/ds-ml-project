@@ -3,65 +3,39 @@ Directory: config
     Content:
     
 Directory: data
-  Directory: amazon-reviews
-    File: amazon_review_ID.shuf.lrn.csv
-      Content:
-      ID,"V1","V2","V3","V4","V5","
-    File: amazon_review_ID.shuf.sol.ex.csv
-      Content:
-      ID,"Class"
-      750,Mitchell
-      ...
-    File: amazon_review_ID.shuf.tes.csv
-      Content:
-      ID,"V1","V2","V3","V4","V5","V6","V7",
-  Directory: congressional-voting
-    File: CongressionalVotingID.shuf.lrn.csv
-      Content:
-      ID,"class","handicapped-infants","water-project-cost-sharing","adoption-of-the-budget-resolution","physician-fee-freeze","el-salvador-aid","religious-groups-in-schools","anti-satellite-test-ban","aid-to-nicaraguan-contras","mx-missile","immigration","synfuels-crporation-cutback","education-spending","superfund-right-to-sue","crime","duty-free-exports","export-administration-act-south-africa"
-      362,democrat,y,n,y,n,y,y,y,n,y,y,n,n,y,y,n,unknown
-      86,democrat,n,n,y,n,y,y,n,n,n,y,y,y,y,y,n,y
-      264,democrat,y,n,y,n,n,n,y,y,y,n,n,n,n,n,y,unknown
-      258,republican,n,n,n,y,y,n,n,n,n,n,n,y,n,y,unknown,y
-      381,democrat,y,y,y,n,n,y,unknown,y,y,n,y,n,y,n,y,y
-      152,democrat,y,y,unknown,y,y,y,n,n,y,n,y,unknown,y,y,n,n
-      412,democrat,y,n,y,n,n,y,y,y,y,y,y,n,n,n,n,y
-      182,democrat,n,n,y,n,n,n,y,y,y,y,y,n,n,n,y,y
-      294,democrat,y,y,y,n,n,y,y,y,y,y,y,n,y,y,y,y
-      424,democrat,n,y,y,n,n,y,y,y,y,n,y,n,n,y,y,y
-      57,republican,n,y,n,y,y,y,n,n,n,y,y,y,y,y,n,y
-      363,democrat,y,y,y,n,n,y,y,y,y,y,y,y,y,n,n,y
-      172,republican,n,unknown,n,
-    File: CongressionalVotingID.shuf.sol.ex.csv
-      Content:
-      ID,"class"
-      190,democrat
-      ...
-      3
-    File: CongressionalVotingID.shuf.tes.csv
-      Content:
-      ID,"handicapped-infants","water-project-cost-sharing","adoption-of-the-budget-resolution","physician-fee-freeze","el-salvador-aid","religious-groups-in-schools","anti-satellite-test-ban","aid-to-nicaraguan-contras","mx-missile","immigration","synfuels-crporation-cutback","education-spending","superfund-right-to-sue","crime","duty-free-exports","export-administration-act-south-africa"
-      190,y,n,y,n,n,n,y,y,y,n,n,n,n,n,y,y
-      285,n,n,y,n,n,y,y,y,y,y,y,n,n,n,unknown,y
-      251,n,y,n,y,y,y,n,n,n,n,n,y,y,y,n,n
-      40,y,n,y,n,n,n,y,y,y,y,y,n,y,n,y,y
-      91,y,n,y,n,n,n,y,y,y,y,n,n,n,n,y,y
-      244,n,y,y,n,n,n,y,y,unknown,y,n,n,y,n,y,y
-      292,y,n,y,n,n,y,y,y,y,y,n,unknown,n,y,n,y
-      151,y,y,n,y,y,y,n,n,n,y,n,y,y,y,n,y
-      317,n,n,n,n,n,y,n,y,y,n,y,y,y,y,y,n
-      138,n,unknown,y,n,n,y,y,y,y,y,n,n,n,y,y,y
-      100,n,n,n,y,y,y,n,n,n,y,unknown,y,y,y,n,n
-      252,n,y,n,y,y,y,n,n,n,n,n,y,y,y,n,n
-      104,y,n,n,n,y,y,unknown,n,unknown,n,n,n,n,y,unknown,n
-      93,y,y,y,n,n,n,y,y,n,y,y,n,n,unknown,y,y
-      430,y,n,y,n,unknown,n,y,y,y,y,n,y,n,unknown,y,y
-      204,y,n,y,
   Directory: processed
     File: README.md
       Content:
       
   Directory: raw
+    Directory: amazon-reviews
+      File: amazon_review_ID.shuf.lrn.csv
+        Content:
+        ID,"V1","V2","V3","V4",...
+      File: amazon_review_ID.shuf.sol.ex.csv
+        Content:
+        ID,"Class"
+        750,Mitchell
+        ...
+      File: CongressionalVotingID.shuf.tes.csv
+        Content:
+        ID,"handicapped-infants","water-project-cost-sharing","adoption-of-the-budget-resolution","physician-fee-freeze","el-salvador-aid","religious-groups-in-schools","anti-satellite-test-ban","aid-to-nicaraguan-contras","mx-missile","immigration","synfuels-crporation-cutback","education-spending","superfund-right-to-sue","crime","duty-free-exports","export-administration-act-south-africa"
+        190,y,n,y,n,n,n,y,y,y,n,n,n,n,n,y,y
+        285,n,n,y,n,n,y,y,y,y,y,y,n,n,n,unknown,y
+        251,n,y,n,y,y,y,n,n,n,n,n,y,y,y,n,n
+        40,y,n,y,n,n,n,y,y,y,y,y,n,y,n,y,y
+        91,y,n,y,n,n,n,y,y,y,y,n,n,n,n,y,y
+        244,n,y,y,n,n,n,y,y,unknown,y,n,n,y,n,y,y
+        292,y,n,y,n,n,y,y,y,y,y,n,unknown,n,y,n,y
+        151,y,y,n,y,y,y,n,n,n,y,n,y,y,y,n,y
+        317,n,n,n,n,n,y,n,y,y,n,y,y,y,y,y,n
+        138,n,unknown,y,n,n,y,y,y,y,y,n,n,n,y,y,y
+        100,n,n,n,y,y,y,n,n,n,y,unknown,y,y,y,n,n
+        252,n,y,n,y,y,y,n,n,n,n,n,y,y,y,n,n
+        104,y,n,n,n,y,y,unknown,n,unknown,n,n,n,n,y,unknown,n
+        93,y,y,y,n,n,n,y,y,n,y,y,n,n,unknown,y,y
+        430,y,n,y,n,unknown,n,y,y,y,y,n,y,n,unknown,y,y
+        204,y,n,y,
     File: README.md
       Content:
       
@@ -280,9 +254,9 @@ Directory: old
     # Define the SVM models with different kernels
     models = [
         ("SVC with linear kernel", SVC(kernel="linear")),
-        ("LinearSVC (linear kernel)", LinearSVC(max_iter=10000)),
+        ("LinearSVC (linear kernel)", LinearSVC(max_iter=20)),
         ("SVC with RBF kernel", SVC(kernel="rbf", gamma=0.7)),
-        ("SVC with polyno
+        ("SVC with polynomia
   File: todos.ipynb
     Content:
     {
@@ -327,6 +301,11 @@ Directory: old
         - [ ] Are there differences across the datasets? Design your experiments so that you can investigate the influence of single parameters.
     
     # experiments
+Directory: output_plots
+  File: confusion_matrices_and_roc_curves.png
+    Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+  File: precision_recall_curves.png
+    Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
 Directory: paul
 File: README.md
   Content:
@@ -355,28 +334,32 @@ Directory: src
   Directory: data_processing
     File: preprocess.py
       Content:
-      # src/data_processing/preprocess.py
-      import numpy as np
-      from sklearn import datasets
+      import pandas as pd
       from sklearn.model_selection import train_test_split
       from sklearn.preprocessing import StandardScaler
       
       def load_and_preprocess_data():
-          # Load the Iris dataset (extendable to other datasets later)
-          iris = datasets.load_iris()
-          X = iris.data[:, :2]  # Select features for visualization
-          y = iris.target
-          
-          # Split into train and test sets
-          X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-          
-          # Standardize features
-          scaler = StandardScaler()
-          X_train = scaler.fit_transform(X_train)
-          X_test = scaler.transform(X_test)
-          
-          return X_train, X_test, y_train, y_test, X, y, iris
+          # Load the training data
+          train_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv')
+          # Load the test data without labels
+          test_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.tes.csv')
       
+          # Check if 'Class' column exists in train data
+          if 'Class' not in train_data.columns:
+              raise ValueError("The 'Class' column is not found in the training dataset.")
+      
+          # Separate features and labels
+          X = train_data.drop(columns=['ID', 'Class'])  # Drop ID and Class columns from features
+          y = train_data['Class']  # Class labels from training data
+          
+          # Convert categorical features to numerical if necessary
+          X = pd.get_dummies(X)
+      
+          # Check class distribution
+          print("Original class distribution in y:")
+          print(y.value_counts())
+      
+          # Ensure there is more than one
     File: __init__.py
       Content:
       
@@ -391,7 +374,7 @@ Directory: src
           y_pred = model.predict(X_test)
           
           # Generate evaluation metrics
-          report = classification_report(y_test, y_pred)
+          report = classification_report(y_test, y_pred, zero_division=0)
           matrix = confusion_matrix(y_test, y_pred)
           
           return report, matrix
@@ -402,39 +385,35 @@ Directory: src
   Directory: experiments
     File: run_experiments.py
       Content:
-      # src/experiments/run_experiments.py
       import sys
       import os
+      import time
+      from tqdm import tqdm  # Import tqdm for progress tracking
       
       # Append the project root directory to sys.path
       project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
       sys.path.append(project_root)
-      
+      import sys
+      import os
+      import time
+      from tqdm import tqdm
+      import pandas as pd
       import numpy as np
       import matplotlib.pyplot as plt
+      import seaborn as sns
+      from sklearn.decomposition import PCA
+      from sklearn.metrics import (confusion_matrix, classification_report,
+                                   roc_curve, auc, precision_recall_curve)
+      from sklearn.svm import SVC
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import label_binarize
       from src.data_processing.preprocess import load_and_preprocess_data
       from src.models.svm import get_svm_models
       from src.evaluation.metrics import evaluate_model
       
-      def plot_decision_boundaries(models, X_train, y_train, X_test, y_test, X, y, iris):
-          plt.figure(figsize=(12, 10))
-      
-          for i, (title, model) in enumerate(models):
-              # Train model
-              model.fit(X_train, y_train)
-              
-              # Evaluate model
-              report, matrix = evaluate_model(model, X_test, y_test)
-              print(f"\n{title}")
-              print(report)
-              print(matrix)
-              
-              # Plot decision boundary
-              plt.subplot(2, 2, i + 1)
-              plt.title(title)
-      
-              x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-              y_min,
+      def plot_confusion_matrix(y_true, y_pred, model_name, ax):
+          cm = confusion_matrix(y_true, y_pred)
+          sns.heatmap(cm, annot=True, fmt='d', cmap
     File: __init__.py
       Content:
       
@@ -454,7 +433,7 @@ Directory: src
           # Define SVM models with different kernels
           models = [
               ("SVC with linear kernel", SVC(kernel="linear")),
-              ("LinearSVC (linear kernel)", LinearSVC(max_iter=10000)),
+              ("LinearSVC (linear kernel)", LinearSVC(max_iter=1000)),
               ("SVC with RBF kernel", SVC(kernel="rbf", gamma=0.7)),
               ("SVC with polynomial (degree 3) kernel", SVC(kernel="poly", degree=3))
           ]
