@@ -1,0 +1,488 @@
+Directory: config
+  File: config.yaml
+    Content:
+    
+Directory: data
+  Directory: amazon-reviews
+    File: amazon_review_ID.shuf.lrn.csv
+      Content:
+      ID,"V1","V2","V3","V4","V5","
+    File: amazon_review_ID.shuf.sol.ex.csv
+      Content:
+      ID,"Class"
+      750,Mitchell
+      ...
+    File: amazon_review_ID.shuf.tes.csv
+      Content:
+      ID,"V1","V2","V3","V4","V5","V6","V7",
+  Directory: congressional-voting
+    File: CongressionalVotingID.shuf.lrn.csv
+      Content:
+      ID,"class","handicapped-infants","water-project-cost-sharing","adoption-of-the-budget-resolution","physician-fee-freeze","el-salvador-aid","religious-groups-in-schools","anti-satellite-test-ban","aid-to-nicaraguan-contras","mx-missile","immigration","synfuels-crporation-cutback","education-spending","superfund-right-to-sue","crime","duty-free-exports","export-administration-act-south-africa"
+      362,democrat,y,n,y,n,y,y,y,n,y,y,n,n,y,y,n,unknown
+      86,democrat,n,n,y,n,y,y,n,n,n,y,y,y,y,y,n,y
+      264,democrat,y,n,y,n,n,n,y,y,y,n,n,n,n,n,y,unknown
+      258,republican,n,n,n,y,y,n,n,n,n,n,n,y,n,y,unknown,y
+      381,democrat,y,y,y,n,n,y,unknown,y,y,n,y,n,y,n,y,y
+      152,democrat,y,y,unknown,y,y,y,n,n,y,n,y,unknown,y,y,n,n
+      412,democrat,y,n,y,n,n,y,y,y,y,y,y,n,n,n,n,y
+      182,democrat,n,n,y,n,n,n,y,y,y,y,y,n,n,n,y,y
+      294,democrat,y,y,y,n,n,y,y,y,y,y,y,n,y,y,y,y
+      424,democrat,n,y,y,n,n,y,y,y,y,n,y,n,n,y,y,y
+      57,republican,n,y,n,y,y,y,n,n,n,y,y,y,y,y,n,y
+      363,democrat,y,y,y,n,n,y,y,y,y,y,y,y,y,n,n,y
+      172,republican,n,unknown,n,
+    File: CongressionalVotingID.shuf.sol.ex.csv
+      Content:
+      ID,"class"
+      190,democrat
+      ...
+      3
+    File: CongressionalVotingID.shuf.tes.csv
+      Content:
+      ID,"handicapped-infants","water-project-cost-sharing","adoption-of-the-budget-resolution","physician-fee-freeze","el-salvador-aid","religious-groups-in-schools","anti-satellite-test-ban","aid-to-nicaraguan-contras","mx-missile","immigration","synfuels-crporation-cutback","education-spending","superfund-right-to-sue","crime","duty-free-exports","export-administration-act-south-africa"
+      190,y,n,y,n,n,n,y,y,y,n,n,n,n,n,y,y
+      285,n,n,y,n,n,y,y,y,y,y,y,n,n,n,unknown,y
+      251,n,y,n,y,y,y,n,n,n,n,n,y,y,y,n,n
+      40,y,n,y,n,n,n,y,y,y,y,y,n,y,n,y,y
+      91,y,n,y,n,n,n,y,y,y,y,n,n,n,n,y,y
+      244,n,y,y,n,n,n,y,y,unknown,y,n,n,y,n,y,y
+      292,y,n,y,n,n,y,y,y,y,y,n,unknown,n,y,n,y
+      151,y,y,n,y,y,y,n,n,n,y,n,y,y,y,n,y
+      317,n,n,n,n,n,y,n,y,y,n,y,y,y,y,y,n
+      138,n,unknown,y,n,n,y,y,y,y,y,n,n,n,y,y,y
+      100,n,n,n,y,y,y,n,n,n,y,unknown,y,y,y,n,n
+      252,n,y,n,y,y,y,n,n,n,n,n,y,y,y,n,n
+      104,y,n,n,n,y,y,unknown,n,unknown,n,n,n,n,y,unknown,n
+      93,y,y,y,n,n,n,y,y,n,y,y,n,n,unknown,y,y
+      430,y,n,y,n,unknown,n,y,y,y,y,n,y,n,unknown,y,y
+      204,y,n,y,
+  Directory: processed
+    File: README.md
+      Content:
+      
+  Directory: raw
+    File: README.md
+      Content:
+      
+  File: TehranHouse.csv
+    Content:
+    Area,Room,Parking,Warehouse,Elevator,Address,Price,Price(USD)
+    63,1,True,True,True,Shahran,1850000000.0,61666.67
+    60,1,True,True,True,Shahran,1850000000.0,61666.67
+    79,2,True,True,True,Pardis,550000000.0,18333.33
+    95,2,True,True,True,Shahrake Qods,902500000.0,30083.33
+    123,2,True,True,True,Shahrake Gharb,7000000000.0,233333.33
+    70,2,True,True,False,North Program Organization,2050000000.0,68333.33
+    87,2,True,True,True,Pardis,600000000.0,20000.0
+    59,1,True,True,True,Shahran,2150000000.0,71666.67
+    54,2,True,True,False,Andisheh,493000000.0,16433.33
+    71,1,True,True,True,West Ferdows Boulevard,2370000000.0,79000.0
+    68,2,True,True,True,West Ferdows Boulevard,2450000000.0,81666.67
+    64,1,True,True,True,Narmak,2100000000.0,70000.0
+    54,1,False,True,True,Narmak,1690000000.0,56333.33
+    136,3,True,True,True,Saadat Abad,11000000000.0,366666.67
+    95,2,True,True,True,Zafar,5000000000.0,166666.67
+    63,1,False,True,False,Islamshahr,570000000.0,19000.0
+    155,3,True,True,True,Narmak,6700000000.0,223333.33
+    64,2,False,True,False
+  File: wine-reviews.arff
+    Content:
+    % Wine data gathered by https://www.kaggle.com/zynicideThe data was scraped from WineEnthusiast during the week of June 15th, 2017. The code for the scraper can be found at https://github.com/zackthoutt/wine-deep-learning
+    @RELATION wine_reviews
+    
+    @ATTRIBUTE country STRING
+    @ATTRIBUTE description STRING
+    @ATTRIBUTE designation STRING
+    @ATTRIBUTE points INTEGER
+    @ATTRIBUTE price REAL
+    @ATTRIBUTE province STRING
+    @ATTRIBUTE region_1 STRING
+    @ATTRIBUTE region_2 STRING
+    @ATTRIBUTE variety STRING
+    @ATTRIBUTE winery STRING
+    
+    @DATA
+    US,'This tremendous 100\% varietal wine hails from Oakville and was aged over three years in oak. Juicy red-cherry fruit and a compelling hint of caramel greet the palate, framed by elegant, fine tannins and a subtle minty tone in the background. Balanced and rewarding from start to finish, it has years ahead of it to develop further nuance. Enjoy 2022–2030.','Martha\'s Vineyard',96,235.0,California,'Napa Valley',Napa,'Cabernet Sauvignon',Heitz
+    Spain,'Ripe aromas of fig, black
+File: generate_context.py
+  Content:
+  import os
+  
+  # List of common files and directories to ignore
+  IGNORE_LIST = {'.git', '.gitignore', '__pycache__', '.env', '.DS_Store', 'node_modules'}
+  
+  def should_ignore(item):
+      """Check if an item should be ignored based on the ignore list."""
+      return item in IGNORE_LIST
+  
+  def generate_context(directory, indent_level=0):
+      """Recursively generates a string representation of the directory structure and its contents."""
+      context = ""
+      indent = '  ' * indent_level  # Indentation for readability
+      for item in os.listdir(directory):
+          path = os.path.join(directory, item)
+          if should_ignore(item):
+              continue  # Skip ignored items
+          
+          if os.path.isdir(path):
+              # If it's a directory, append its name and recurse into it
+              context += f"{indent}Directory: {item}\n"
+              context += generate_context(path, indent_level + 1)  # Recur for the directory
+          elif os.path.isfile(path):
+              # If it's a file, append its
+Directory: notebooks
+  File: eda.ipynb
+    Content:
+    
+Directory: old
+  File: create_repo_structure.py
+    Content:
+    import os
+    
+    # Define the directory structure and files to be created
+    structure = {
+        "data": ["raw/README.md", "processed/README.md"],
+        "notebooks": ["eda.ipynb"],
+        "src": [
+            "__init__.py",
+            "data_processing/__init__.py",
+            "data_processing/preprocess.py",
+            "models/__init__.py",
+            "models/svm.py",
+            "models/random_forest.py",
+            "models/nn.py",
+            "experiments/__init__.py",
+            "experiments/run_experiments.py",
+            "evaluation/__init__.py",
+            "evaluation/metrics.py",
+            "utils/__init__.py",
+            "utils/helper_functions.py",
+        ],
+        "config": ["config.yaml"],
+        "tests": [
+            "__init__.py",
+            "test_data_processing.py",
+            "test_models.py",
+            "test_evaluation.py",
+        ],
+    }
+    
+    # Define the contents of each file
+    file_contents = {
+        "README.md": "# Project Name\n\nThis project runs machine learning experiments on multiple datasets using different classifiers (SVM, Random Forest, Neural Ne
+  File: exercise00.ipynb
+    Content:
+    {
+     "cells": [
+      {
+       "cell_type": "markdown",
+       "metadata": {},
+       "source": [
+        "# Exercise 0"
+       ]
+      },
+      {
+       "cell_type": "markdown",
+       "metadata": {},
+       "source": [
+        "## Housing Dataset - Regression\n",
+        "### Source\n",
+        "https://www.kaggle.com/datasets/valakhorasani/tehran-house-prices-dataset\n",
+        "### Features\n",
+        "About this file\n",
+        "- File Name: tehran_property_prices.csv\n",
+        "- File Format: CSV (Comma-Separated Values)\n",
+        "- File Size: Approximately [insert file size here, e.g., 1.5 MB]\n",
+        "- Number of Rows: [insert number of rows, e.g., 1,000]\n",
+        "- Number of Columns: [insert number of columns, e.g., 12]\n",
+        "- Column Description\n",
+        "- Price (USD): The price of the property in US Dollars.\n",
+        "- Price (IRR): The price of the property in Iranian Rials.\n",
+        "- Area: The total area of the property in square meters.\n",
+        "- Room: The number of rooms in the property.\n",
+        "- Parking: Availability of parking (Yes
+  File: experiment-template.ipynb
+    Content:
+    {
+     "cells": [
+      {
+       "cell_type": "markdown",
+       "metadata": {},
+       "source": [
+        "# ML-Pipeline"
+       ]
+      },
+      {
+       "cell_type": "markdown",
+       "metadata": {},
+       "source": [
+        "## 0. Dependencies"
+       ]
+      },
+      {
+       "cell_type": "code",
+       "execution_count": 2,
+       "metadata": {},
+       "outputs": [],
+       "source": [
+        "# setup dependencies\n",
+        "import sys\n",
+        "import sklearn\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "import matplotlib.pyplot as plt\n",
+        "# extra code – the next 5 lines define the default font sizes\n",
+        "plt.rc('font', size=14)\n",
+        "plt.rc('axes', labelsize=14, titlesize=14)\n",
+        "plt.rc('legend', fontsize=14)\n",
+        "plt.rc('xtick', labelsize=10)\n",
+        "plt.rc('ytick', labelsize=10)"
+       ]
+      },
+      {
+       "cell_type": "markdown",
+       "metadata": {},
+       "source": [
+        "## 1. Read & Introduce Data"
+       ]
+      },
+      {
+       "cell_type": "code",
+       "execution_count": null,
+       "metadata": {},
+       "outputs": [],
+       "source": [
+        "read_df =
+  File: svm_classifier.py
+    Content:
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn import datasets
+    from sklearn.model_selection import train_test_split
+    from sklearn.svm import SVC, LinearSVC
+    from sklearn.metrics import classification_report, confusion_matrix
+    from sklearn.preprocessing import StandardScaler
+    
+    # Load the Iris dataset
+    iris = datasets.load_iris()
+    X = iris.data[:, :2]  # We only take the first two features for visualization
+    y = iris.target
+    
+    # Split the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    
+    # Standardize the dataset (SVMs are sensitive to feature scaling)
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+    
+    # Define the SVM models with different kernels
+    models = [
+        ("SVC with linear kernel", SVC(kernel="linear")),
+        ("LinearSVC (linear kernel)", LinearSVC(max_iter=10000)),
+        ("SVC with RBF kernel", SVC(kernel="rbf", gamma=0.7)),
+        ("SVC with polyno
+  File: todos.ipynb
+    Content:
+    {
+     "cells": [
+      {
+       "cell_type": "markdown",
+       "metadata": {},
+       "source": [
+        "# "
+       ]
+      }
+     ],
+     "metadata": {
+      "kernelspec": {
+       "display_name": ".venv",
+       "language": "python",
+       "name": "python3"
+      },
+      "language_info": {
+       "name": "python",
+       "version": "3.12.3"
+      }
+     },
+     "nbformat": 4,
+     "nbformat_minor": 2
+    }
+    
+  File: todos.md
+    Content:
+    # todos exercise 1
+    - [ ] Pick 3 Classifier => maybe split work on classifier level, then bottleneck is preprocessing
+      - [ ] pick cross classifier performance metric for comparison
+    [ ] Introduce the 4 Datasets => same for all experiments
+    [ ] Preprocessing for the 4 Datasets => same for all experiments?
+    [ ] For each Classifier:
+    - [ ] evaluate different model parameters and pre-processing-mthods on performance for the different types of datasets
+    - [ ] compare holdout to cross-validation => maybe random holdout vs distributed holdout vs cross-validation
+    - [ ] pattern/trend analysis:
+        - [ ] Which methods work well and which did not, is there e.g. one method outperforming the others on all datasets?
+        - [ ] How do the results change when preprocessing strategies change? 
+        - [ ] How sensitive is an algorithm to parameter settings?
+        - [ ] Are there differences across the datasets? Design your experiments so that you can investigate the influence of single parameters.
+    
+    # experiments
+Directory: paul
+File: README.md
+  Content:
+  # ds-ml-project
+  data science tu wien machine learning project
+  
+File: report.md
+  Content:
+  # 1. Abstract
+  
+  # 2. Introduction of Datasets and Classifiers
+  Keep the overview of datasets, algorithms brief, do not repeat materials from the lectures
+  
+  # 3. Preprocessing
+  
+  # 4. Experiments and Findings
+  
+  # 5. Summary
+File: requirements.txt
+  Content:
+  matplotlib==3.9.2
+  pandas==2.2.3
+  numpy==2.1.2
+  scipy==1.14.1
+Directory: src
+  Directory: data_processing
+    File: preprocess.py
+      Content:
+      # src/data_processing/preprocess.py
+      import numpy as np
+      from sklearn import datasets
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      
+      def load_and_preprocess_data():
+          # Load the Iris dataset (extendable to other datasets later)
+          iris = datasets.load_iris()
+          X = iris.data[:, :2]  # Select features for visualization
+          y = iris.target
+          
+          # Split into train and test sets
+          X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+          
+          # Standardize features
+          scaler = StandardScaler()
+          X_train = scaler.fit_transform(X_train)
+          X_test = scaler.transform(X_test)
+          
+          return X_train, X_test, y_train, y_test, X, y, iris
+      
+    File: __init__.py
+      Content:
+      
+  Directory: evaluation
+    File: metrics.py
+      Content:
+      # src/evaluation/metrics.py
+      from sklearn.metrics import classification_report, confusion_matrix
+      
+      def evaluate_model(model, X_test, y_test):
+          # Predict on test data
+          y_pred = model.predict(X_test)
+          
+          # Generate evaluation metrics
+          report = classification_report(y_test, y_pred)
+          matrix = confusion_matrix(y_test, y_pred)
+          
+          return report, matrix
+      
+    File: __init__.py
+      Content:
+      
+  Directory: experiments
+    File: run_experiments.py
+      Content:
+      # src/experiments/run_experiments.py
+      import sys
+      import os
+      
+      # Append the project root directory to sys.path
+      project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+      sys.path.append(project_root)
+      
+      import numpy as np
+      import matplotlib.pyplot as plt
+      from src.data_processing.preprocess import load_and_preprocess_data
+      from src.models.svm import get_svm_models
+      from src.evaluation.metrics import evaluate_model
+      
+      def plot_decision_boundaries(models, X_train, y_train, X_test, y_test, X, y, iris):
+          plt.figure(figsize=(12, 10))
+      
+          for i, (title, model) in enumerate(models):
+              # Train model
+              model.fit(X_train, y_train)
+              
+              # Evaluate model
+              report, matrix = evaluate_model(model, X_test, y_test)
+              print(f"\n{title}")
+              print(report)
+              print(matrix)
+              
+              # Plot decision boundary
+              plt.subplot(2, 2, i + 1)
+              plt.title(title)
+      
+              x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+              y_min,
+    File: __init__.py
+      Content:
+      
+  Directory: models
+    File: nn.py
+      Content:
+      
+    File: random_forest.py
+      Content:
+      
+    File: svm.py
+      Content:
+      # src/models/svm.py
+      from sklearn.svm import SVC, LinearSVC
+      
+      def get_svm_models():
+          # Define SVM models with different kernels
+          models = [
+              ("SVC with linear kernel", SVC(kernel="linear")),
+              ("LinearSVC (linear kernel)", LinearSVC(max_iter=10000)),
+              ("SVC with RBF kernel", SVC(kernel="rbf", gamma=0.7)),
+              ("SVC with polynomial (degree 3) kernel", SVC(kernel="poly", degree=3))
+          ]
+          return models
+      
+    File: __init__.py
+      Content:
+      
+  Directory: utils
+    File: helper_functions.py
+      Content:
+      
+    File: __init__.py
+      Content:
+      
+  File: __init__.py
+    Content:
+    
+Directory: tests
+  File: test_data_processing.py
+    Content:
+    
+  File: test_evaluation.py
+    Content:
+    
+  File: test_models.py
+    Content:
+    
+  File: __init__.py
+    Content:
+    
