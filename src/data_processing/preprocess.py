@@ -4,226 +4,164 @@ import pandas as pd
 import numpy as np
 import re
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+
+import re
+import pandas as pd
+def input_data_check(file_path):
+    """Checks to determine data integrety
+    """
+    # Check if the file exists
+    
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file {file_path} was not found.")
+    print(f"file_path:  {file_path} exists")
+
+def load_arff_data(file_path, columns, target_column=None, drop_columns=None):
+    """Load and preprocess ARFF file into a DataFrame."""
+
+    
+    # Open and read the file lines
+    with open(file_path, 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+    
+    # Check if the @data tag is present in the file
+    data_start_idx = None
+    for i, line in enumerate(lines):
+        if line.strip().lower() == '@data':
+            data_start_idx = i + 1
+            break
+    if data_start_idx is None:
+        raise ValueError("The ARFF file does not contain a '@data' section.")
+    
+    # Extract data lines
+    data_lines = lines[data_start_idx:]
+    print(f"Data lines start from line index {data_start_idx}.")
+
+    # Regular expression to handle ARFF data lines with commas and quotes correctly
+    pattern = re.compile(r"""('(?:\\.|[^'])*'|[^,]+)""")
+    
+    # Parse data rows
+    data = []
+    for line in data_lines:
+        row = [x.strip().strip("'") for x in pattern.findall(line.strip())]
+        if len(row) != len(columns):
+            print(f"Skipping malformed row: {row}")  # Log rows that don't match expected column length
+            continue
+        data.append(row)
+    
+    print(f"Parsed {len(data)} rows successfully.")
+    
+    # Create DataFrame
+    df = pd.DataFrame(data, columns=columns)
+    
+    # Convert data types
+    df = df.apply(pd.to_numeric, errors='coerce', axis=0)
+
+    # Drop rows with missing target if specified
+    if target_column:
+        df = df.dropna(subset=[target_column])
+    
+    # Drop specified columns
+    if drop_columns:
+        df = df.drop(columns=drop_columns)
+    
+    print("DataFrame loaded with shape:", df.shape)
+    return df
+
+
+def preprocess_categorical(df, categorical_features, top_n_limit=20):
+    """Limit high-cardinality categories in categorical features."""
+    for col in categorical_features:
+        top_n = min(df[col].nunique(), top_n_limit)
+        top_categories = df[col].value_counts().nlargest(top_n).index
+        df[col] = df[col].apply(lambda x: x if x in top_categories else 'Other')
+    return pd.get_dummies(df, drop_first=True)
+
+def standardize_features(X_train, X_val, sparse=False):
+    """Standardize features, optionally handling sparse data."""
+    scaler = StandardScaler(with_mean=not sparse)
+    return scaler.fit_transform(X_train), scaler.transform(X_val)
+
+def load_and_split_data(X, y, test_size=0.3, stratify=None):
+    """Split data into training and validation sets."""
+    return train_test_split(X, y, test_size=test_size, stratify=stratify, random_state=42)
+
+def load_wine_review_data():
+    file_path = 'data/raw/wine-reviews.arff'
+    columns = ['country', 'description', 'designation', 'points', 'price', 'province', 'region_1', 'region_2', 'variety', 'winery']
+    wine_df = load_arff_data(file_path, columns, target_column='points', drop_columns=['description'])
+
+    wine_df['price'].fillna(wine_df['price'].median(), inplace=True)
+    wine_df.fillna({'country': 'Unknown', 'designation': 'Unknown', 'province': 'Unknown', 'region_1': 'Unknown', 'region_2': 'Unknown', 'variety': 'Unknown', 'winery': 'Unknown'}, inplace=True)
+
+    X, y = wine_df.drop(columns=['points']), wine_df['points']
+    X = preprocess_categorical(X, ['country', 'designation', 'province', 'region_1', 'region_2', 'variety', 'winery'])
+    X_train, X_val, y_train, y_val = load_and_split_data(X, y)
+    X_train, X_val = standardize_features(X_train, X_val, sparse=True)
+    
+    return X_train, X_val, y_train, y_val
+
+def load_amazon_review_data():
+    train_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv')
+    if 'Class' not in train_data:
+        raise ValueError("The 'Class' column is missing from the Amazon reviews dataset.")
+
+    X, y = train_data.drop(columns=['ID', 'Class']), train_data['Class']
+    X = pd.get_dummies(X)
+    X_train, X_val, y_train, y_val = load_and_split_data(X, y, stratify=y)
+    X_train, X_val = standardize_features(X_train, X_val)
+
+    return X_train, X_val, y_train, y_val
+
+def load_congressional_voting_data():
+    data = pd.read_csv('data/raw/congressional-voting/CongressionalVotingID.shuf.lrn.csv')
+    if 'class' not in data:
+        raise ValueError("The 'class' column is missing from the Congressional voting dataset.")
+    
+    X = data.drop(columns=['ID', 'class']).replace({'y': 1, 'n': 0, 'unknown': np.nan}).fillna(method='ffill')
+    y = data['class']
+    X_train, X_val, y_train, y_val = load_and_split_data(X, y, stratify=y)
+    X_train, X_val = standardize_features(X_train, X_val)
+
+    return X_train, X_val, y_train, y_val
+
+def load_traffic_data():
+    data_dir = 'data/raw/traffic-data/'
+    files = [os.path.join(data_dir, f) for f in ['Traffic.csv', 'TrafficTwoMonth.csv']]
+    data = pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
+
+    if 'Time' in data:
+        data['Time'] = pd.to_datetime(data['Time'], format='%I:%M:%S %p', errors='coerce').dt.hour.fillna(method='ffill')
+    if 'Date' in data:
+        data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
+        data['DayOfWeek'], data['Month'], data['Day'] = data['Date'].dt.dayofweek, data['Date'].dt.month, data['Date'].dt.day
+
+    if 'Traffic Situation' not in data:
+        raise ValueError("'Traffic Situation' column is missing from the traffic dataset.")
+    
+    X, y = data.drop(columns=['Traffic Situation', 'Date']), data['Traffic Situation']
+    X.fillna(X.mean(numeric_only=True), inplace=True)
+    y.fillna(y.mode()[0], inplace=True)
+
+    X_train, X_val, y_train, y_val = load_and_split_data(X, y, stratify=y)
+    X_train, X_val = standardize_features(X_train, X_val)
+    
+    if y_train.dtype == 'object':
+        le = LabelEncoder()
+        y_train, y_val = le.fit_transform(y_train), le.transform(y_val)
+
+    return X_train, X_val, y_train, y_val
 
 def load_and_preprocess_data(dataset_name):
-    if dataset_name == 'amazon_reviews':
-        # Load Amazon Reviews dataset
-        train_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv')
-        test_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.tes.csv')
-
-        if 'Class' not in train_data.columns:
-            raise ValueError("The 'Class' column is not found in the training dataset.")
-
-        X = train_data.drop(columns=['ID', 'Class'])
-        y = train_data['Class']
-        X = pd.get_dummies(X)
-
-        print("Original class distribution in y:")
-        print(y.value_counts())
-
-        if y.nunique() < 2:
-            raise ValueError("The training set contains only one class.")
-
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=0.3, stratify=y, random_state=42
-        )
-
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_val = scaler.transform(X_val)
-
-
-        result = (X_train, X_val, y_train, y_val)
-        print(f"Number of items being returned: {len(result)}")
-        return result
-
-    elif dataset_name == 'congressional_voting':
-        # Load Congressional Voting dataset
-        data = pd.read_csv('data/raw/congressional-voting/CongressionalVotingID.shuf.lrn.csv')
-
-        if 'class' not in data.columns:
-            raise ValueError("The 'Class' column is not found in the dataset.")
-
-        X = data.drop(columns=['ID', 'class'])
-        y = data['class']
-
-        # Convert categorical features to numerical
-        X = X.replace({'y': 1, 'n': 0, 'unknown': np.nan})
-        X = X.fillna(X.mode().iloc[0])  # Fill missing values with the mode
-
-        print("Original class distribution in y:")
-        print(y.value_counts())
-
-        if y.nunique() < 2:
-            raise ValueError("The dataset contains only one class.")
-
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=0.3, stratify=y, random_state=42
-        )
-
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_val = scaler.transform(X_val)
-
-        result = (X_train, X_val, y_train, y_val)
-        print(f"Number of items being returned: {len(result)}")
-        return result
-
-    elif dataset_name == 'wine_reviews':
-        # **Load the Wine Reviews dataset manually**
-        file_path = 'data/raw/wine-reviews.arff'
-        columns = ['country', 'description', 'designation', 'points', 'price',
-                   'province', 'region_1', 'region_2', 'variety', 'winery']
-        
-        # Read the ARFF file
-        with open(file_path, 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-        
-        # Find the start of data
-        data_start_idx = next(i for i, line in enumerate(lines) if line.strip().lower() == '@data') + 1
-        data_lines = lines[data_start_idx:]
-        
-        data = []
-        
-        # Regular expression to handle ARFF data lines with commas and quotes correctly
-        pattern = re.compile(r"""('(?:\\.|[^'])*'|[^,]+)""")
-        
-        for line in data_lines:
-            # Split the line using the regular expression
-            row = [x.strip().strip("'") for x in pattern.findall(line.strip())]
-            data.append(row)
-        
-        # Create DataFrame
-        wine_df = pd.DataFrame(data, columns=columns)
-        
-         # Convert data types
-        wine_df['points'] = pd.to_numeric(wine_df['points'], errors='coerce')
-        wine_df['price'] = pd.to_numeric(wine_df['price'], errors='coerce')
-
-        # Drop rows with missing target variable 'points'
-        wine_df = wine_df.dropna(subset=['points'])
-
-        # Fill missing values in features
-        wine_df = wine_df.fillna({
-            'country': 'Unknown',
-            'designation': 'Unknown',
-            'price': wine_df['price'].median(),
-            'province': 'Unknown',
-            'region_1': 'Unknown',
-            'region_2': 'Unknown',
-            'variety': 'Unknown',
-            'winery': 'Unknown'
-        })
-
-        # Drop 'description' column as it may be too text-heavy
-        wine_df = wine_df.drop(columns=['description'])
-
-        # **Limit categories for high-cardinality features**
-        categorical_features = ['country', 'designation', 'province', 'region_1', 'region_2', 'variety', 'winery']
-
-        for col in categorical_features:
-            # Determine the top N categories
-            top_n = 20 if wine_df[col].nunique() > 30 else wine_df[col].nunique()
-            top_categories = wine_df[col].value_counts().nlargest(top_n).index
-            # Replace less frequent categories with 'Other'
-            wine_df[col] = wine_df[col].apply(lambda x: x if x in top_categories else 'Other')
-
-        # Features and target
-        X = wine_df.drop(columns=['points'])
-        y = wine_df['points']
-
-        # One-hot encode categorical variables
-        X = pd.get_dummies(X, drop_first=True)
-
-        # Split the data
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=0.3, random_state=42
-        )
-
-        # Standardize features
-        scaler = StandardScaler(with_mean=False)  # Set with_mean=False for sparse data
-        X_train = scaler.fit_transform(X_train)
-        X_val = scaler.transform(X_val)
-
-        result = (X_train, X_val, y_train, y_val)
-        print(f"Number of items being returned: {len(result)}")
-        return result
-
-    elif dataset_name == 'traffic_prediction':
-        # Load the manually downloaded dataset
-        data_dir = 'data/raw/traffic-data/'
-        file1 = os.path.join(data_dir, 'Traffic.csv')
-        file2 = os.path.join(data_dir, 'TrafficTwoMonth.csv')  # Ensure the filename matches
-
-        # Load the datasets
-        df1 = pd.read_csv(file1)
-        df2 = pd.read_csv(file2)
-
-        # Combine the datasets
-        data = pd.concat([df1, df2], ignore_index=True)
-
-        # Parse 'Time' column to extract hour
-        if 'Time' in data.columns:
-            data['Time'] = pd.to_datetime(data['Time'], format='%I:%M:%S %p', errors='coerce').dt.hour
-            data['Time'].fillna(method='ffill', inplace=True)
-        else:
-            pass
-
-        # Parse 'Date' column and extract features
-        if 'Date' in data.columns:
-            data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
-            data['DayOfWeek'] = data['Date'].dt.dayofweek  # Numerical day of the week (0=Monday)
-            data['Month'] = data['Date'].dt.month
-            data['Day'] = data['Date'].dt.day
-        else:
-            pass
-
-        # **Handle categorical variables**
-        categorical_columns = ['Day of the week']  # Include 'Day of the week' as a categorical column
-
-        # Encode 'Day of the week' using label encoding
-        for col in categorical_columns:
-            if col in data.columns:
-                data[col] = data[col].astype('category').cat.codes
-
-        # Define features and target
-        if 'Traffic Situation' in data.columns:
-            X = data.drop(columns=['Traffic Situation', 'Date'])  # Drop 'Date' column
-            y = data['Traffic Situation']
-        else:
-            raise ValueError("'Traffic Situation' column not found in the dataset.")
-
-        # Handle missing values
-        X = X.fillna(X.mean(numeric_only=True))
-        y = y.fillna(y.mode()[0])
-
-        # **Ensure all columns are numeric**
-        print("Data types after preprocessing:")
-        print(X.dtypes)
-
-        # Split the data
-        X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=0.3, stratify=y, random_state=42
-        )
-
-        # **Encode target variable if necessary**
-        if y_train.dtype == 'object':
-            from sklearn.preprocessing import LabelEncoder
-            le = LabelEncoder()
-            y_train = le.fit_transform(y_train)
-            y_val = le.transform(y_val)
-        else:
-            pass
-
-        # Standardize features
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_val = scaler.transform(X_val)
-
-        result = (X_train, X_val, y_train, y_val)
-        print(f"Number of items being returned: {len(result)}")
-        return result
-
-    else:
+    loaders = {
+        'wine_reviews': load_wine_review_data,
+        'amazon_reviews': load_amazon_review_data,
+        'congressional_voting': load_congressional_voting_data,
+        'traffic_prediction': load_traffic_data,
+    }
+    if dataset_name not in loaders:
         raise ValueError("Invalid dataset name provided.")
+    
+    return loaders[dataset_name]()
