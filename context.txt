@@ -2,21 +2,209 @@ Directory: config
   File: config.yaml
     Content:
     
+Directory: congressional_voting
 Directory: data
   Directory: processed
     File: README.md
+      Content:
+      
+    File: wine_reviews_processed.csv
+      Content:
+      country,description
+      US,tremendous varietal wine hail oakville age three year oak juicy redcherry fruit compelling hint caramel greet palate frame elegant fine tannin subtle minty tone background balance reward start finish year ahead develop nuance enjoy
+      Spain,ripe aroma fig blackberry cassis soften sweeten slathering oaky chocolate vanilla full layer intense cushion palate rich flavor chocolaty black fruit bake spice toasty everlasting finish heady ideally balance drink
+      US,mac watson honor memory wine make mother tremendously delicious balanced complex botrytised white dark gold color layer toast hazelnut pear compote orange peel flavor revel succulence gl residual sugar
+      US,spend month new french oak incorporate fruit ponzi aurora abetina madrona vineyard among others aromatic dense toasty deftly blend aromas flavor toast cigar box blackberry black cherry coffee graphite tannin polish fine sheen frame finish load dark chocolate espresso drink
+      France,top wine la bgude name high point v
+    File: wine_reviews_tfidf_vectorizer.pkl
       Content:
       
   Directory: raw
     Directory: amazon-reviews
       File: amazon_review_ID.shuf.lrn.csv
         Content:
-        ID,"V1","V2","V3","V4",...
+        ID,"V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","V11","V12","V13","V14","V15","V16","V17","V18","V19","V20","V21","V22","V23","V24","V25","V26","V27","V28","V29","V30","V31","V32","V33","V34","V35","V36","V37","V38","V39","V40","V41","V42","V43","V44","V45","V46","V47","V48","V49","V50","V51","V52","V53","V54","V55","V56","V57","V58","V59","V60","V61","V62","V63","V64","V65","V66","V67","V68","V69","V70","V71","V72","V73","V74","V75","V76","V77","V78","V79","V80","V81","V82","V83","V84","V85","V86","V87","V88","V89","V90","V91","V92","V93","V94","V95","V96","V97","V98","V99","V100","V101","V102","V103","V104","V105","V106","V107","V108","V109","V110","V111","V112","V113","V114","V115","V116","V117","V118","V119","V120","V121","V122","V123","V124","V125","V126","V127","V128","V129","V130","V131","V132","V133","V134","V135","V136","V137","V138","V139","V140","V141","V142","V143","V144","V145","V146","V147","V148","V149","V150","V151","V152","V153","V154","V155","V156","V157","V158"
       File: amazon_review_ID.shuf.sol.ex.csv
         Content:
         ID,"Class"
         750,Mitchell
-        ...
+        751,Mitchell
+        752,Mitchell
+        753,Mitchell
+        754,Mitchell
+        755,Mitchell
+        756,Mitchell
+        757,Mitchell
+        758,Mitchell
+        759,Mitchell
+        760,Mitchell
+        761,Mitchell
+        762,Mitchell
+        763,Mitchell
+        764,Mitchell
+        765,Mitchell
+        766,Mitchell
+        767,Mitchell
+        768,Mitchell
+        769,Mitchell
+        770,Mitchell
+        771,Mitchell
+        772,Mitchell
+        773,Mitchell
+        774,Mitchell
+        775,Mitchell
+        776,Mitchell
+        777,Mitchell
+        778,Mitchell
+        779,Mitchell
+        780,Mitchell
+        781,Mitchell
+        782,Mitchell
+        783,Mitchell
+        784,Mitchell
+        785,Mitchell
+        786,Mitchell
+        787,Mitchell
+        788,Mitchell
+        789,Mitchell
+        790,Mitchell
+        791,Mitchell
+        792,Mitchell
+        793,Mitchell
+        794,Mitchell
+        795,Mitchell
+        796,Mitchell
+        797,Mitchell
+        798,Mitchell
+        799,Mitchell
+        800,Mitchell
+        801,Mitchell
+        802,Mitchell
+        803,Mitchell
+        804,Mitchell
+        805,Mitchell
+        806,Mitchell
+        807,Mitchell
+        808,Mitchell
+        809,Mitchell
+        810,Mitchell
+        811,Mitchell
+        812,Mitchell
+        813,Mitchell
+        814,Mitchell
+        815,Mitchell
+        816,Mitchell
+        817,Mitchell
+        818,Mitchell
+        819,Mitchell
+        820,Mitchell
+        821,Mitchell
+        822,Mitchell
+        823,Mitchell
+        824,Mitchell
+        825,Mitchell
+        8
+      File: amazon_review_ID.shuf.tes.csv
+        Content:
+        ID,"V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","V11","V12","V13","V14","V15","V16","V17","V18","V19","V20","V21","V22","V23","V24","V25","V26","V27","V28","V29","V30","V31","V32","V33","V34","V35","V36","V37","V38","V39","V40","V41","V42","V43","V44","V45","V46","V47","V48","V49","V50","V51","V52","V53","V54","V55","V56","V57","V58","V59","V60","V61","V62","V63","V64","V65","V66","V67","V68","V69","V70","V71","V72","V73","V74","V75","V76","V77","V78","V79","V80","V81","V82","V83","V84","V85","V86","V87","V88","V89","V90","V91","V92","V93","V94","V95","V96","V97","V98","V99","V100","V101","V102","V103","V104","V105","V106","V107","V108","V109","V110","V111","V112","V113","V114","V115","V116","V117","V118","V119","V120","V121","V122","V123","V124","V125","V126","V127","V128","V129","V130","V131","V132","V133","V134","V135","V136","V137","V138","V139","V140","V141","V142","V143","V144","V145","V146","V147","V148","V149","V150","V151","V152","V153","V154","V155","V156","V157","V158"
+    Directory: congressional-voting
+      File: CongressionalVotingID.shuf.lrn.csv
+        Content:
+        ID,"class","handicapped-infants","water-project-cost-sharing","adoption-of-the-budget-resolution","physician-fee-freeze","el-salvador-aid","religious-groups-in-schools","anti-satellite-test-ban","aid-to-nicaraguan-contras","mx-missile","immigration","synfuels-crporation-cutback","education-spending","superfund-right-to-sue","crime","duty-free-exports","export-administration-act-south-africa"
+        362,democrat,y,n,y,n,y,y,y,n,y,y,n,n,y,y,n,unknown
+        86,democrat,n,n,y,n,y,y,n,n,n,y,y,y,y,y,n,y
+        264,democrat,y,n,y,n,n,n,y,y,y,n,n,n,n,n,y,unknown
+        258,republican,n,n,n,y,y,n,n,n,n,n,n,y,n,y,unknown,y
+        381,democrat,y,y,y,n,n,y,unknown,y,y,n,y,n,y,n,y,y
+        152,democrat,y,y,unknown,y,y,y,n,n,y,n,y,unknown,y,y,n,n
+        412,democrat,y,n,y,n,n,y,y,y,y,y,y,n,n,n,n,y
+        182,democrat,n,n,y,n,n,n,y,y,y,y,y,n,n,n,y,y
+        294,democrat,y,y,y,n,n,y,y,y,y,y,y,n,y,y,y,y
+        424,democrat,n,y,y,n,n,y,y,y,y,n,y,n,n,y,y,y
+        57,republican,n,y,n,y,y,y,n,n,n,y,y,y,y,y,n,y
+        363,democrat,y,y,y,n,n,y,y,y,y,y,y,y,y,n,n,y
+        172,republican,n,unknown,n,
+      File: CongressionalVotingID.shuf.sol.ex.csv
+        Content:
+        ID,"class"
+        190,democrat
+        285,democrat
+        251,democrat
+        40,democrat
+        91,democrat
+        244,democrat
+        292,democrat
+        151,democrat
+        317,democrat
+        138,democrat
+        100,democrat
+        252,democrat
+        104,democrat
+        93,democrat
+        430,democrat
+        204,democrat
+        123,democrat
+        165,democrat
+        278,democrat
+        78,democrat
+        385,democrat
+        360,democrat
+        95,democrat
+        428,democrat
+        84,democrat
+        300,democrat
+        122,democrat
+        256,democrat
+        391,democrat
+        248,democrat
+        315,democrat
+        270,democrat
+        325,democrat
+        286,democrat
+        357,democrat
+        416,democrat
+        53,democrat
+        214,democrat
+        435,democrat
+        177,democrat
+        386,democrat
+        367,democrat
+        131,democrat
+        200,democrat
+        90,democrat
+        371,democrat
+        388,democrat
+        420,democrat
+        327,democrat
+        392,democrat
+        393,democrat
+        305,democrat
+        169,democrat
+        374,democrat
+        337,democrat
+        198,democrat
+        80,democrat
+        421,democrat
+        164,democrat
+        130,democrat
+        242,democrat
+        128,democrat
+        76,democrat
+        87,democrat
+        35,democrat
+        354,democrat
+        25,democrat
+        390,democrat
+        311,democrat
+        423,democrat
+        135,democrat
+        342,democrat
+        127,democrat
+        166,democrat
+        299,democrat
+        222,democrat
+        193,democrat
+        3
       File: CongressionalVotingID.shuf.tes.csv
         Content:
         ID,"handicapped-infants","water-project-cost-sharing","adoption-of-the-budget-resolution","physician-fee-freeze","el-salvador-aid","religious-groups-in-schools","anti-satellite-test-ban","aid-to-nicaraguan-contras","mx-missile","immigration","synfuels-crporation-cutback","education-spending","superfund-right-to-sue","crime","duty-free-exports","export-administration-act-south-africa"
@@ -39,6 +227,77 @@ Directory: data
     File: README.md
       Content:
       
+    Directory: traffic-data
+      File: Traffic.csv
+        Content:
+        Time,Date,Day of the week,CarCount,BikeCount,BusCount,TruckCount,Total,Traffic Situation
+        12:00:00 AM,10,Tuesday,31,0,4,4,39,low
+        12:15:00 AM,10,Tuesday,49,0,3,3,55,low
+        12:30:00 AM,10,Tuesday,46,0,3,6,55,low
+        12:45:00 AM,10,Tuesday,51,0,2,5,58,low
+        1:00:00 AM,10,Tuesday,57,6,15,16,94,normal
+        1:15:00 AM,10,Tuesday,44,0,5,4,53,low
+        1:30:00 AM,10,Tuesday,37,0,1,4,42,low
+        1:45:00 AM,10,Tuesday,42,4,4,5,55,low
+        2:00:00 AM,10,Tuesday,51,0,9,7,67,low
+        2:15:00 AM,10,Tuesday,34,0,4,7,45,low
+        2:30:00 AM,10,Tuesday,45,0,1,1,47,low
+        2:45:00 AM,10,Tuesday,45,0,1,3,49,low
+        3:00:00 AM,10,Tuesday,50,0,3,0,53,low
+        3:15:00 AM,10,Tuesday,34,0,4,4,42,low
+        3:30:00 AM,10,Tuesday,129,22,42,1,194,heavy
+        3:45:00 AM,10,Tuesday,144,16,49,0,209,heavy
+        4:00:00 AM,10,Tuesday,111,28,20,3,162,normal
+        4:15:00 AM,10,Tuesday,67,11,10,16,104,normal
+        4:30:00 AM,10,Tuesday,65,24,7,16,112,normal
+        4:45:00 AM,10,Tuesday,94,27,7,16,144,normal
+        5:00:00 AM,10,Tuesday,94,20,8,7,129,normal
+        5:15:00 AM,10,Tuesday,67,29,5,10,111,low
+        5:30:00 AM,10,Tuesda
+      File: TrafficTwoMonth.csv
+        Content:
+        Time,Date,Day of the week,CarCount,BikeCount,BusCount,TruckCount,Total,Traffic Situation
+        12:00:00 AM,10,Tuesday,13,2,2,24,41,normal
+        12:15:00 AM,10,Tuesday,14,1,1,36,52,normal
+        12:30:00 AM,10,Tuesday,10,2,2,32,46,normal
+        12:45:00 AM,10,Tuesday,10,2,2,36,50,normal
+        1:00:00 AM,10,Tuesday,11,2,1,34,48,normal
+        1:15:00 AM,10,Tuesday,15,1,1,39,56,normal
+        1:30:00 AM,10,Tuesday,14,2,2,27,45,normal
+        1:45:00 AM,10,Tuesday,13,2,1,20,36,normal
+        2:00:00 AM,10,Tuesday,7,0,0,26,33,normal
+        2:15:00 AM,10,Tuesday,13,0,0,34,47,normal
+        2:30:00 AM,10,Tuesday,15,2,0,38,55,normal
+        2:45:00 AM,10,Tuesday,5,2,0,37,44,normal
+        3:00:00 AM,10,Tuesday,9,1,0,34,44,normal
+        3:15:00 AM,10,Tuesday,8,0,2,35,45,normal
+        3:30:00 AM,10,Tuesday,7,0,0,34,41,normal
+        3:45:00 AM,10,Tuesday,10,1,2,38,51,normal
+        4:00:00 AM,10,Tuesday,82,7,3,10,102,low
+        4:15:00 AM,10,Tuesday,71,3,0,30,104,normal
+        4:30:00 AM,10,Tuesday,89,10,2,10,111,low
+        4:45:00 AM,10,Tuesday,77,3,0,18,98,low
+        5:00:00 AM,10,Tuesday,90,2,0,22,114,normal
+        5:15:00 AM,10,Tuesday,84,1,7,23,11
+    File: wine-reviews.arff
+      Content:
+      % Wine data gathered by https://www.kaggle.com/zynicideThe data was scraped from WineEnthusiast during the week of June 15th, 2017. The code for the scraper can be found at https://github.com/zackthoutt/wine-deep-learning
+      @RELATION wine_reviews
+      
+      @ATTRIBUTE country STRING
+      @ATTRIBUTE description STRING
+      @ATTRIBUTE designation STRING
+      @ATTRIBUTE points INTEGER
+      @ATTRIBUTE price REAL
+      @ATTRIBUTE province STRING
+      @ATTRIBUTE region_1 STRING
+      @ATTRIBUTE region_2 STRING
+      @ATTRIBUTE variety STRING
+      @ATTRIBUTE winery STRING
+      
+      @DATA
+      US,'This tremendous 100\% varietal wine hails from Oakville and was aged over three years in oak. Juicy red-cherry fruit and a compelling hint of caramel greet the palate, framed by elegant, fine tannins and a subtle minty tone in the background. Balanced and rewarding from start to finish, it has years ahead of it to develop further nuance. Enjoy 2022–2030.','Martha\'s Vineyard',96,235.0,California,'Napa Valley',Napa,'Cabernet Sauvignon',Heitz
+      Spain,'Ripe aromas of fig, black
   File: TehranHouse.csv
     Content:
     Area,Room,Parking,Warehouse,Elevator,Address,Price,Price(USD)
@@ -60,25 +319,6 @@ Directory: data
     63,1,False,True,False,Islamshahr,570000000.0,19000.0
     155,3,True,True,True,Narmak,6700000000.0,223333.33
     64,2,False,True,False
-  File: wine-reviews.arff
-    Content:
-    % Wine data gathered by https://www.kaggle.com/zynicideThe data was scraped from WineEnthusiast during the week of June 15th, 2017. The code for the scraper can be found at https://github.com/zackthoutt/wine-deep-learning
-    @RELATION wine_reviews
-    
-    @ATTRIBUTE country STRING
-    @ATTRIBUTE description STRING
-    @ATTRIBUTE designation STRING
-    @ATTRIBUTE points INTEGER
-    @ATTRIBUTE price REAL
-    @ATTRIBUTE province STRING
-    @ATTRIBUTE region_1 STRING
-    @ATTRIBUTE region_2 STRING
-    @ATTRIBUTE variety STRING
-    @ATTRIBUTE winery STRING
-    
-    @DATA
-    US,'This tremendous 100\% varietal wine hails from Oakville and was aged over three years in oak. Juicy red-cherry fruit and a compelling hint of caramel greet the palate, framed by elegant, fine tannins and a subtle minty tone in the background. Balanced and rewarding from start to finish, it has years ahead of it to develop further nuance. Enjoy 2022–2030.','Martha\'s Vineyard',96,235.0,California,'Napa Valley',Napa,'Cabernet Sauvignon',Heitz
-    Spain,'Ripe aromas of fig, black
 File: generate_context.py
   Content:
   import os
@@ -302,10 +542,353 @@ Directory: old
     
     # experiments
 Directory: output_plots
-  File: confusion_matrices_and_roc_curves.png
-    Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
-  File: precision_recall_curves.png
-    Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+  Directory: amazon_reviews
+    File: biplot_principal_components.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: confusion_matrices_amazon_reviews.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: decision_boundaries.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: precision_recall_curves_amazon_reviews.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: results_amazon_reviews.json
+      Content:
+      [
+          {
+              "model_name": "SVC with linear kernel",
+              "training_time": 38.85341024398804,
+              "classification_report": {
+                  "0": {
+                      "precision": 0.6666666666666666,
+                      "recall": 0.8,
+                      "f1-score": 0.7272727272727272,
+                      "support": 5
+                  },
+                  "1": {
+                      "precision": 1.0,
+                      "recall": 0.5,
+                      "f1-score": 0.6666666666666666,
+                      "support": 4
+                  },
+                  "2": {
+                      "precision": 0.0,
+                      "recall": 0.0,
+                      "f1-score": 0.0,
+                      "support": 4
+                  },
+                  "3": {
+                      "precision": 1.0,
+                      "recall": 0.8,
+                      "f1-score": 0.888888888888889,
+                      "support": 5
+                  },
+                  "4": {
+                      "precision": 0.375,
+                      "recall": 0.6,
+                      "f1-score": 0.4615384615384615,
+                      "support": 5
+    File: roc_curves_amazon_reviews.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+  Directory: congressional_voting
+    File: biplot_principal_components.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: confusion_matrices_congressional_voting.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: decision_boundaries.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: precision_recall_curves_congressional_voting.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: results_congressional_voting.json
+      Content:
+      [
+          {
+              "model_name": "SVC with linear kernel",
+              "training_time": 0.0077991485595703125,
+              "classification_report": {
+                  "0": {
+                      "precision": 0.95,
+                      "recall": 1.0,
+                      "f1-score": 0.9743589743589743,
+                      "support": 38
+                  },
+                  "1": {
+                      "precision": 1.0,
+                      "recall": 0.9285714285714286,
+                      "f1-score": 0.962962962962963,
+                      "support": 28
+                  },
+                  "accuracy": 0.9696969696969697,
+                  "macro avg": {
+                      "precision": 0.975,
+                      "recall": 0.9642857142857143,
+                      "f1-score": 0.9686609686609686,
+                      "support": 66
+                  },
+                  "weighted avg": {
+                      "precision": 0.9712121212121211,
+                      "recall": 0.9696969696969697,
+                      "f1-score": 0.9695243028576361,
+                      "support": 66
+                  }
+              },
+              "confusion
+    File: roc_curves_congressional_voting.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+  Directory: traffic_prediction
+    File: biplot_principal_components.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: confusion_matrices_traffic_prediction.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: decision_boundaries.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: precision_recall_curves_traffic_prediction.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+    File: results_traffic_prediction.json
+      Content:
+      [{
+              "model_name": "SVC with linear kernel",
+              "training_time": 3.8036718368530273,
+              "classification_report": {
+                  "0": {
+                      "precision": 0.9765342960288809,
+                      "recall": 0.9908424908424909,
+                      "f1-score": 0.9836363636363635,
+                      "support": 546
+                  },
+                  "1": {
+                      "precision": 0.7359550561797753,
+                      "recall": 0.6298076923076923,
+                      "f1-score": 0.6787564766839378,
+                      "support": 208
+                  },
+                  "2": {
+                      "precision": 0.7571428571428571,
+                      "recall": 0.6217008797653959,
+                      "f1-score": 0.6827697262479872,
+                      "support": 341
+                  },
+                  "3": {
+                      "precision": 0.8782243551289742,
+                      "recall": 0.9242424242424242,
+                      "f1-score": 0.9006459550907413,
+                      "support": 1584
+                  },
+                  "accuracy": 0.8764464352
+    File: roc_curves_traffic_prediction.png
+      Content: [Could not read file: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte]
+Directory: output_results
+  Directory: amazon_reviews
+    File: results_amazon_reviews_SVC with polynomial (degree 3) kernel.json
+      Content:
+      [
+          {
+              "accuracy": 0.5244444444444445,
+              "precision": 0.6001672771672771,
+              "recall": 0.5043333333333334,
+              "f1_score": 0.5001201196464354,
+              "roc_auc": 0.953151504900256,
+              "training_time": 10.294833660125732,
+              "model_name": "SVC with linear kernel"
+          },
+          {
+              "accuracy": 0.02666666666666667,
+              "precision": 0.0005333333333333334,
+              "recall": 0.02,
+              "f1_score": 0.001038961038961039,
+              "roc_auc": 0.49453501864339905,
+              "training_time": 19.592761039733887,
+              "model_name": "SVC with RBF kernel"
+          },
+          {
+              "accuracy": 0.035555555555555556,
+              "precision": 0.040538116591928255,
+              "recall": 0.03,
+              "f1_score": 0.017048034934497816,
+              "roc_auc": 0.13295571636055117,
+              "training_time": 10.433022499084473,
+              "model_name": "SVC with polynomial (degree 3) kernel"
+          }
+      ]
+  Directory: wine_reviews
+    File: results_wine_reviews_SVC with polynomial (degree 3) kernel.json
+      Content:
+      [{
+              "accuracy": 0.653,
+              "classification_report": "              precision    recall  f1-score   support\n\n           1       0.25      0.03      0.05        36\n           2       1.00      0.07      0.12        30\n           3       1.00      0.00      0.00        16\n           5       1.00      0.00      0.00         1\n           6       1.00      0.00      0.00         1\n           7       1.00      0.00      0.00         1\n           8       0.62      0.18      0.28        44\n          10       1.00      0.00      0.00         1\n          11       1.00      0.00      0.00         1\n          15       0.66      0.73      0.70       130\n          17       1.00      0.00      0.00        20\n          18       1.00      0.00      0.00         4\n          20       1.00      0.00      0.00         1\n          21       1.00      0.00      0.00         4\n          22       0.87      0.80      0.83       165\n          29       1.00      0.00      0.00         1\
+    File: results_wine_reviews_svm.json
+      Content:
+      [
+          {
+              "model_name": "SVC with linear kernel",
+              "accuracy": 0.653,
+              "classification_report": {
+                  "1": {
+                      "precision": 0.25,
+                      "recall": 0.027777777777777776,
+                      "f1-score": 0.049999999999999996,
+                      "support": 36
+                  },
+                  "2": {
+                      "precision": 1.0,
+                      "recall": 0.06666666666666667,
+                      "f1-score": 0.125,
+                      "support": 30
+                  },
+                  "3": {
+                      "precision": 1.0,
+                      "recall": 0.0,
+                      "f1-score": 0.0,
+                      "support": 16
+                  },
+                  "5": {
+                      "precision": 1.0,
+                      "recall": 0.0,
+                      "f1-score": 0.0,
+                      "support": 1
+                  },
+                  "6": {
+                      "precision": 1.0,
+                      "recall": 0.0,
+                      "f1-score": 0.0,
+                      "support": 1
+                  },
+                  "7": {
+        
+    File: SVC with linear kernel_metrics.json
+      Content:
+      {
+          "model_name": "SVC with linear kernel",
+          "accuracy": 0.653,
+          "classification_report": {
+              "1": {
+                  "precision": 0.25,
+                  "recall": 0.027777777777777776,
+                  "f1-score": 0.049999999999999996,
+                  "support": 36
+              },
+              "2": {
+                  "precision": 1.0,
+                  "recall": 0.06666666666666667,
+                  "f1-score": 0.125,
+                  "support": 30
+              },
+              "3": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 16
+              },
+              "5": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "6": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "7": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "8": {
+             
+    File: SVC with polynomial (degree 3) kernel_metrics.json
+      Content:
+      {
+          "model_name": "SVC with polynomial (degree 3) kernel",
+          "accuracy": 0.419,
+          "classification_report": {
+              "1": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 36
+              },
+              "2": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 30
+              },
+              "3": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 16
+              },
+              "5": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "6": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "7": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "8": {
+                  "precision": 1.0,
+                  "re
+    File: SVC with RBF kernel_metrics.json
+      Content:
+      {
+          "model_name": "SVC with RBF kernel",
+          "accuracy": 0.56,
+          "classification_report": {
+              "1": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 36
+              },
+              "2": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 30
+              },
+              "3": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 16
+              },
+              "5": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "6": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "7": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+                  "f1-score": 0.0,
+                  "support": 1
+              },
+              "8": {
+                  "precision": 1.0,
+                  "recall": 0.0,
+             
 Directory: paul
 File: README.md
   Content:
@@ -334,32 +917,41 @@ Directory: src
   Directory: data_processing
     File: preprocess.py
       Content:
+      # src/data_processing/preprocess.py
+      import os
       import pandas as pd
+      import numpy as np
+      import re
       from sklearn.model_selection import train_test_split
-      from sklearn.preprocessing import StandardScaler
+      from sklearn.preprocessing import StandardScaler, LabelEncoder
       
-      def load_and_preprocess_data():
-          # Load the training data
-          train_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv')
-          # Load the test data without labels
-          test_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.tes.csv')
-      
-          # Check if 'Class' column exists in train data
-          if 'Class' not in train_data.columns:
-              raise ValueError("The 'Class' column is not found in the training dataset.")
-      
-          # Separate features and labels
-          X = train_data.drop(columns=['ID', 'Class'])  # Drop ID and Class columns from features
-          y = train_data['Class']  # Class labels from training data
+      import re
+      import pandas as pd
+      def input_data_check(file_path):
+          """Checks to determine data integrety
+          """
+          # Check if the file exists
           
-          # Convert categorical features to numerical if necessary
-          X = pd.get_dummies(X)
       
-          # Check class distribution
-          print("Original class distribution in y:")
-          print(y.value_counts())
+          if not os.path.exists(file_path):
+              raise FileNotFoundError(f"The file {file_path} was not found.")
+          print(f"file_path:  {file_path} exists")
       
-          # Ensure there is more than one
+      import re
+      import pandas as pd
+      import numpy as np
+      
+      def load_arff_data(file_path, columns, target_column=None, drop_columns=None):
+          """Load and preprocess ARFF file into a DataFrame."""
+          # Check if the file exists
+          if not os.path.exists(file_path):
+              raise FileNotFoundError(f"The file {file_path} was not found.")
+          
+          # Open and read the file lines
+          with open(file_path, 'r', encoding='utf-8') as file:
+              lines = file.readlines()
+          
+          # Check if the 
     File: __init__.py
       Content:
       
@@ -367,78 +959,148 @@ Directory: src
     File: metrics.py
       Content:
       # src/evaluation/metrics.py
-      from sklearn.metrics import classification_report, confusion_matrix
+      from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, accuracy_score
+      import numpy as np
+      import json
+      import os
+      
       
       def evaluate_model(model, X_test, y_test):
           # Predict on test data
           y_pred = model.predict(X_test)
           
-          # Generate evaluation metrics
-          report = classification_report(y_test, y_pred, zero_division=0)
-          matrix = confusion_matrix(y_test, y_pred)
+          # Check if the model supports probability prediction (for ROC AUC calculation)
+          try:
+              y_score = model.predict_proba(X_test)
+              roc_auc = roc_auc_score(y_test, y_score, multi_class='ovr')
+          except (AttributeError, ValueError):
+              y_score = None
+              roc_auc = None
           
-          return report, matrix
-      
+          # Generate metrics
+          report = classification_report(y_test, y_pred, zero_division=1, output_dict=True)  # output_dict=True for better structure
+          matrix = confusion_matrix(y_test, y_pred)
+          accuracy = accuracy_score(y_test, y_pred)
+          
+          # Organize all metrics in a dictionary
+          metrics = {
+              "model_name": type(model).__name__,
+              "accuracy": accuracy,
+              "classification_report": report,
+       
     File: __init__.py
       Content:
       
   Directory: experiments
-    File: run_experiments.py
+    File: plot_decision_boundaries.py
       Content:
+      # src/experiments/plot_decision_boundaries.py
+      
       import sys
       import os
-      import time
-      from tqdm import tqdm  # Import tqdm for progress tracking
-      
       # Append the project root directory to sys.path
       project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
       sys.path.append(project_root)
+      import time
+      import numpy as np
+      import pandas as pd
+      import matplotlib.pyplot as plt
+      from sklearn import svm
+      from sklearn.decomposition import PCA
+      from sklearn.preprocessing import LabelEncoder, StandardScaler
+      from src.data_processing.preprocess import load_and_preprocess_data
+      
+      # Create output directory if it doesn't exist
+      output_dir = os.path.join(project_root, 'output_plots')
+      if not os.path.exists(output_dir):
+          os.makedirs(output_dir)
+      
+      def main():
+          # Load and preprocess data
+          X_train, X_val, y_train, y_val = load_and_preprocess_data("wine_reviews")
+      
+          # Combine training and validation data
+          X = np.vstack((X_train, X_val))
+          y = np.hstack((y_train, y_val))
+      
+          # Encode labels
+          label_encoder = LabelEncoder()
+          y_encoded = label_encoder.fit_tr
+    File: run_experiments.py
+      Content:
+      ## src/experiments/run_experiments.py
+      #
       import sys
       import os
-      import time
-      from tqdm import tqdm
-      import pandas as pd
-      import numpy as np
-      import matplotlib.pyplot as plt
-      import seaborn as sns
-      from sklearn.decomposition import PCA
-      from sklearn.metrics import (confusion_matrix, classification_report,
-                                   roc_curve, auc, precision_recall_curve)
-      from sklearn.svm import SVC
-      from sklearn.pipeline import Pipeline
-      from sklearn.preprocessing import label_binarize
-      from src.data_processing.preprocess import load_and_preprocess_data
-      from src.models.svm import get_svm_models
-      from src.evaluation.metrics import evaluate_model
-      
-      def plot_confusion_matrix(y_true, y_pred, model_name, ax):
-          cm = confusion_matrix(y_true, y_pred)
-          sns.heatmap(cm, annot=True, fmt='d', cmap
+      #import time
+      #from tqdm import tqdm
+      #
+      # Append the project root directory to sys.path
+      project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+      sys.path.append(project_root)
+      #
+      #import numpy as np
+      #import pandas as pd
+      #import matplotlib.pyplot as plt
+      #import seaborn as sns
+      #
+      #from sklearn.decomposition import PCA
+      #from sklearn.metrics import (
+      #    confusion_matrix,
+      #    classification_report,
+      #    roc_curve,
+      #    auc,
+      #    precision_recall_curve,
+      #    roc_auc_score,
+      #    mean_squared_error,
+      #    r2_score,
+      #)
+      #from sklearn.svm import SVC, SVR, LinearSVC, LinearSVR
+      #from sklearn.preprocessing import label_binarize, LabelEncoder
+      #
+      #from src.data_processing.preprocess import load_and_preprocess_data
+      #from src.models.svm import get_svm_models
+      #from src.models.knn import get_knn_models
+      #from src.models.rf import get_rf
+      #
+      #import json
+      #import argparse
+      #
+      #def plot_confusion_matrix(y_true, y_pred, model_name, a
     File: __init__.py
       Content:
       
   Directory: models
-    File: nn.py
+    File: knn.py
       Content:
-      
-    File: random_forest.py
+      # src/models/svm.py
+      def get_knn_models():
+          # Define SVM models with probability estimates
+          models = ""
+          
+          return models
+    File: rf.py
       Content:
-      
+      def get_rf_models():
+          # Define SVM models with probability estimates
+          models = ""
+          
+          return models
     File: svm.py
       Content:
       # src/models/svm.py
       from sklearn.svm import SVC, LinearSVC
+      from sklearn.calibration import CalibratedClassifierCV
       
       def get_svm_models():
-          # Define SVM models with different kernels
+          # Define SVM models with probability estimates
           models = [
-              ("SVC with linear kernel", SVC(kernel="linear")),
-              ("LinearSVC (linear kernel)", LinearSVC(max_iter=1000)),
-              ("SVC with RBF kernel", SVC(kernel="rbf", gamma=0.7)),
-              ("SVC with polynomial (degree 3) kernel", SVC(kernel="poly", degree=3))
-          ]
+              #("Calibrated LinearSVC (linear kernel)", CalibratedClassifierCV(LinearSVC(max_iter=100))),
+              ("SVC with linear kernel", SVC(kernel="linear", probability=True)),
+              ("SVC with RBF kernel", SVC(kernel="rbf", probability=True)),
+              ("SVC with polynomial (degree 3) kernel", SVC(kernel="poly", degree=3, probability=True)),
+              ]
           return models
-      
     File: __init__.py
       Content:
       
