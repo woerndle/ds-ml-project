@@ -21,7 +21,7 @@ if not os.path.exists(output_dir):
 
 def main():
     # Load and preprocess data
-    X_train, X_val, y_train, y_val = load_and_preprocess_data("traffic_prediction")
+    X_train, X_val, y_train, y_val = load_and_preprocess_data("wine_reviews")
 
     # Combine training and validation data
     X = np.vstack((X_train, X_val))
