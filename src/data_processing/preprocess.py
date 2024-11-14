@@ -16,6 +16,7 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.impute import SimpleImputer
 
+
 # Ensure NLTK resources are available
 nltk.download('omw-1.4', quiet=True)
 nltk.download('stopwords', quiet=True)
@@ -238,57 +239,58 @@ def load_congressional_voting_data():
     
     return X_train, X_val, y_train, y_val, label_encoder, None
 
+
+
 def load_traffic_data():
     """Load and preprocess the traffic dataset."""
     data_dir = 'data/raw/traffic-data/'
     files = ['Traffic.csv', 'TrafficTwoMonth.csv']
-    data = pd.concat([pd.read_csv(os.path.join(data_dir, f)) for f in files], ignore_index=True)
     
-    # Convert 'Time' to hour
+    # Load and combine datasets, checking for duplicates
+    data = pd.concat([pd.read_csv(os.path.join(data_dir, f)) for f in files], ignore_index=True)
+    data = data.drop_duplicates(subset=['Time', 'Date', 'Day of the week'])  # Handle overlapping content
+    
+    # Convert 'Time' to hour (if necessary)
     if 'Time' in data:
         data['Time'] = pd.to_datetime(data['Time'], format='%I:%M:%S %p', errors='coerce').dt.hour
         data['Time'].fillna(data['Time'].mode()[0], inplace=True)
     
-    # Convert 'Date' to datetime and extract features
+    # Process 'Date' column to retain only the day of the month
     if 'Date' in data:
-        data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
-        data['DayOfWeek'] = data['Date'].dt.day_name()
-        data['Month'] = data['Date'].dt.month
-        data['Day'] = data['Date'].dt.day
+        data['Day'] = pd.to_numeric(data['Date'], errors='coerce')
     
+    # Ensure 'Day of the week' is correctly formatted as categorical
+    if 'Day of the week' in data:
+        data['Day of the week'] = data['Day of the week'].astype(str)
+    
+    # Check for missing values in 'Traffic Situation' column
     if 'Traffic Situation' not in data:
         raise ValueError("'Traffic Situation' column is missing from the traffic dataset.")
     
+    # Prepare feature and target sets
     X = data.drop(columns=['Traffic Situation', 'Date'])
     y = data['Traffic Situation']
     
     # Handle missing values in X
     X.fillna(X.mode().iloc[0], inplace=True)
     
-    # Encode categorical features
-    categorical_features = ['DayOfWeek']
-    X = pd.get_dummies(X, columns=categorical_features)
-
-        # Identify all categorical features
-    categorical_features = ['Day of the week', 'Time']
-
-    # Convert 'Time' to categorical if it's still in string format
-    if 'Time' in X and X['Time'].dtype == object:
-        categorical_features.append('Time')
-
-    # Use one-hot encoding
-    X = pd.get_dummies(X, columns=categorical_features)
+    # Identify categorical features (excluding 'Time')
+    categorical_features = ['Day of the week']
+    X = pd.get_dummies(X, columns=categorical_features, drop_first=True)
     
     # Encode labels
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
     
-    X_train, X_val, y_train, y_val = load_and_split_data(X, y_encoded, stratify=y_encoded)
+    # Split data into training and validation sets
+    X_train, X_val, y_train, y_val = train_test_split(X, y_encoded, test_size=0.2, stratify=y_encoded, random_state=42)
     
     # Feature scaling
     X_train, X_val = standardize_features(X_train, X_val)
     
     return X_train, X_val, y_train, y_val, label_encoder, None
+
+
 
 def load_and_preprocess_data(dataset_name):
     """Load and preprocess data based on the dataset name."""
