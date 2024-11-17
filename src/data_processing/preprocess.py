@@ -16,6 +16,8 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.impute import SimpleImputer
 
+from scipy.sparse import hstack, csr_matrix
+
 # Ensure NLTK resources are available
 nltk.download('omw-1.4', quiet=True)
 nltk.download('stopwords', quiet=True)
@@ -125,17 +127,6 @@ def load_and_split_data(X, y, test_size=0.3, stratify=None, data_size=None):
 
 def load_wine_review_data(data_size=None):
     """Load and preprocess the wine review dataset."""
-    import os
-    import pandas as pd
-    import numpy as np
-    from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import LabelEncoder, StandardScaler
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from scipy.sparse import hstack, csr_matrix
-    from tqdm import tqdm
-    import nltk
-    from nltk.tokenize import word_tokenize
-
     # Ensure NLTK resources are available
     nltk.download('punkt', quiet=True)
 

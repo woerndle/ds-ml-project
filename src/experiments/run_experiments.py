@@ -372,6 +372,58 @@ def plot_precision_recall_curve(y_true, y_scores, model_name, ax):
     ax.set_title(f'Precision-Recall Curve\n{model_name}')
     ax.legend(loc='lower left', fontsize='small')
 
+def plot_classification_report_heatmap(y_true, y_pred, model_name, ax):
+    from sklearn.metrics import classification_report
+    import pandas as pd
+    report = classification_report(y_true, y_pred, output_dict=True)
+    report_df = pd.DataFrame(report).transpose()
+    # Exclude 'accuracy', 'macro avg', 'weighted avg' rows
+    report_df = report_df.iloc[:-3, :]
+    sns.heatmap(report_df.iloc[:, :-1], annot=True, cmap='Blues', fmt='.2f', ax=ax)
+    ax.set_title(f'Classification Report Heatmap\n{model_name}')
+    ax.set_xlabel('Metrics')
+    ax.set_ylabel('Classes')
+
+def plot_decision_boundary(model, X, y, model_name, ax):
+    from matplotlib.colors import ListedColormap
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
+    import numpy as np
+
+    # Reduce data to two dimensions
+    if X.shape[1] > 2:
+        pca = PCA(n_components=2)
+        X_reduced = pca.fit_transform(X)
+    else:
+        X_reduced = X
+
+    # Standardize data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X_reduced)
+
+    # Fit model on reduced data
+    model.fit(X_scaled, y)
+
+    # Create mesh grid
+    x_min, x_max = X_scaled[:, 0].min() - 1, X_scaled[:, 0].max() + 1
+    y_min, y_max = X_scaled[:, 1].min() - 1, X_scaled[:, 1].max() + 1
+    h = (x_max - x_min) / 100
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+
+    # Predict on mesh grid
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+
+    # Plot
+    cm = plt.cm.RdBu
+    cm_bright = ListedColormap(['#FF0000', '#0000FF'])
+    ax.contourf(xx, yy, Z, cmap=cm, alpha=0.8)
+    ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c=y, cmap=cm_bright, edgecolor='k', s=20)
+    ax.set_title(f'Decision Boundary\n{model_name}')
+    ax.set_xlabel('Feature 1')
+    ax.set_ylabel('Feature 2')
+
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description='Run experiments on a dataset.')
@@ -384,8 +436,10 @@ def main():
     model_type = args.model
 
     # Load and preprocess data
-    X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = load_and_preprocess_data(dataset_name)
-
+    X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = load_and_preprocess_data(
+    dataset_name='wine_reviews',
+    data_size=100000
+)
     # Check if X_train is a sparse matrix and convert to CSR format
     if issparse(X_train):
         X_train = X_train.tocsr()
@@ -434,14 +488,37 @@ def main():
                 print(f"Model {model_name} does not support probability estimates.")
                 continue
 
-            fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-            plot_confusion_matrix(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[0])
-            plot_roc_curve(y_test_decoded, y_scores, model_name, ax=axes[1])
-            plot_precision_recall_curve(y_test_decoded, y_scores, model_name, ax=axes[2])
-
-            # Save the plot
+            # Create a directory for the model's output
             output_dir = os.path.join("output_results", dataset_name, model_name)
             os.makedirs(output_dir, exist_ok=True)
+
+            # Initialize subplots
+            fig, axes = plt.subplots(2, 3, figsize=(27, 10))
+
+            # Plot Confusion Matrix
+            plot_confusion_matrix(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[0, 0])
+
+            # Plot ROC Curve
+            plot_roc_curve(y_test_decoded, y_scores, model_name, ax=axes[0, 1])
+
+            # Plot Precision-Recall Curve
+            plot_precision_recall_curve(y_test_decoded, y_scores, model_name, ax=axes[0, 2])
+
+            # Plot Classification Report Heatmap
+            plot_classification_report_heatmap(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[1, 0])
+
+            # Plot Decision Boundary (if applicable)
+            try:
+                plot_decision_boundary(model, X_val, y_val, model_name, ax=axes[1, 1])
+            except Exception as e:
+                print(f"Decision boundary plot not generated for {model_name}: {e}")
+                axes[1, 1].set_visible(False)
+
+            # Hide any unused subplots
+            axes[1, 2].set_visible(False)
+
+            # Adjust layout and save the plot
+            plt.tight_layout()
             plt.savefig(os.path.join(output_dir, f"{model_name}_plots.png"))
             plt.close()
 
