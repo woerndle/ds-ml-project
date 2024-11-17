@@ -11,11 +11,10 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk import pos_tag
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.impute import SimpleImputer
-
 
 # Ensure NLTK resources are available
 nltk.download('omw-1.4', quiet=True)
@@ -116,31 +115,55 @@ def standardize_features(X_train, X_val):
         X_val = scaler.transform(X_val)
     return X_train, X_val
 
-
-def load_and_split_data(X, y, test_size=0.3, stratify=None):
+def load_and_split_data(X, y, test_size=0.3, stratify=None, data_size=None):
     """Split data into training and validation sets."""
+    # Adjust data size if specified
+    if data_size is not None and data_size < len(X):
+        # Use stratify to maintain class proportions
+        X, _, y, _ = train_test_split(X, y, train_size=data_size, stratify=y, random_state=42)
     return train_test_split(X, y, test_size=test_size, stratify=stratify, random_state=42)
 
-def load_wine_review_data():
+def load_wine_review_data(data_size=None):
     """Load and preprocess the wine review dataset."""
+    import os
+    import pandas as pd
+    import numpy as np
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import LabelEncoder, StandardScaler
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from scipy.sparse import hstack, csr_matrix
+    from tqdm import tqdm
+    import nltk
+    from nltk.tokenize import word_tokenize
+
+    # Ensure NLTK resources are available
+    nltk.download('punkt', quiet=True)
+
     processed_file_path = 'data/processed/wine_reviews_processed.csv'
+    required_columns = ['country', 'description', 'points', 'price', 'variety', 'winery']
 
     # Check if processed data exists
     if os.path.exists(processed_file_path):
         print("Loading processed data...")
         wine_df = pd.read_csv(processed_file_path)
+
+        # Check if required columns are present
+        missing_columns = [col for col in required_columns if col not in wine_df.columns]
+        if missing_columns:
+            print(f"Processed data is missing columns: {missing_columns}. Reprocessing raw data...")
+            os.remove(processed_file_path)
+            return load_wine_review_data(data_size)  # Call the function again to reprocess
     else:
         print("Processing raw data...")
         file_path = 'data/raw/wine-reviews.arff'
         columns = ['country', 'description', 'designation', 'points', 'price', 'province',
                    'region_1', 'region_2', 'variety', 'winery']
-        
-        # Load raw data and drop unnecessary columns
+
+        # Load raw data and keep all features
         wine_df = load_arff_data(
             file_path,
             columns,
-            drop_columns=['designation', 'points', 'price', 'province', 'region_1',
-                          'region_2', 'variety', 'winery']
+            drop_columns=[]  # Keep all columns
         )
 
         # Drop rows with missing 'country' or 'description'
@@ -149,7 +172,9 @@ def load_wine_review_data():
         # Preprocess text data
         print("Preprocessing text data...")
         wine_df['description'] = wine_df['description'].str.lower()
-        wine_df['description'] = [word_tokenize(text) for text in tqdm(wine_df['description'], desc="Tokenizing")]
+        wine_df['description'] = [
+            word_tokenize(text) for text in tqdm(wine_df['description'], desc="Tokenizing")
+        ]
         wine_df['description'] = [
             preprocess_text(tokens) for tokens in tqdm(wine_df['description'], desc="Cleaning and lemmatizing")
         ]
@@ -159,29 +184,113 @@ def load_wine_review_data():
         wine_df.to_csv(processed_file_path, index=False)
         print("Processed data saved for future use.")
 
-    # Filter out classes with fewer than 2 instances
-    country_counts = wine_df['country'].value_counts()
-    common_countries = country_counts[country_counts > 1].index
-    wine_df = wine_df[wine_df['country'].isin(common_countries)]
-    print(f"Data shape after removing single-instance countries: {wine_df.shape}")
+    # Include Additional Features
+    # Handle numerical features: 'points', 'price'
+    numerical_features = ['points', 'price']
+    for col in numerical_features.copy():
+        if col in wine_df.columns:
+            wine_df[col] = pd.to_numeric(wine_df[col], errors='coerce')
+            wine_df[col].fillna(wine_df[col].median(), inplace=True)
+        else:
+            print(f"Warning: Column '{col}' not found in data. It will be excluded.")
+            numerical_features.remove(col)
 
-    # Encode target variable (country)
+    # Handle categorical features: 'variety', 'winery'
+    categorical_features = ['variety', 'winery']
+    for col in categorical_features.copy():
+        if col in wine_df.columns:
+            wine_df[col] = wine_df[col].fillna('Unknown')
+        else:
+            print(f"Warning: Column '{col}' not found in data. It will be excluded.")
+            categorical_features.remove(col)
+
+    # Filter Classes with Sufficient Samples
+    min_samples_per_class = 2
+    country_counts = wine_df['country'].value_counts()
+    sufficient_countries = country_counts[country_counts >= min_samples_per_class].index
+    wine_df = wine_df[wine_df['country'].isin(sufficient_countries)]
+
+    # Limit to Top N Countries if Desired
+    top_N_countries = 10  # Adjust as needed
+    top_countries = wine_df['country'].value_counts().nlargest(top_N_countries).index
+    wine_df = wine_df[wine_df['country'].isin(top_countries)]
+    print(f"Data shape after selecting top {top_N_countries} countries: {wine_df.shape}")
+
+    # Adjust Data Size with Stratified Sampling
+    if data_size is not None and data_size < len(wine_df):
+        # Ensure stratified sampling to maintain class distribution
+        wine_df = wine_df.groupby('country', group_keys=False).apply(
+            lambda x: x.sample(min(len(x), data_size // top_N_countries), random_state=42)
+        ).reset_index(drop=True)
+        # After sampling, remove any classes with less than 2 samples
+        country_counts = wine_df['country'].value_counts()
+        sufficient_countries = country_counts[country_counts >= min_samples_per_class].index
+        wine_df = wine_df[wine_df['country'].isin(sufficient_countries)]
+
+    # Encode Target Variable
     label_encoder = LabelEncoder()
     y = label_encoder.fit_transform(wine_df['country'])
 
-    # TF-IDF vectorization on the processed text data
+    # Process Categorical Features
+    # For 'variety' and 'winery', encode only the most frequent categories
+    for col in categorical_features:
+        top_categories = wine_df[col].value_counts().nlargest(10).index  # Keep top 10 categories
+        wine_df[col] = wine_df[col].apply(lambda x: x if x in top_categories else 'Other')
+
+    # One-hot encode the categorical features
+    wine_df = pd.get_dummies(wine_df, columns=categorical_features, drop_first=True)
+
+    # TF-IDF Vectorization
     tfidf_vect = TfidfVectorizer()
     X_tfidf = tfidf_vect.fit_transform(wine_df['description'])
 
-    # Split the data into training and validation sets
+    # Remove 'description' and 'country' from wine_df as they're already processed
+    columns_to_drop = ['description', 'country']
+    wine_df.drop(columns=[col for col in columns_to_drop if col in wine_df.columns], inplace=True)
+
+    # Drop any remaining unprocessed object-type columns
+    unprocessed_cols = wine_df.select_dtypes(include=['object']).columns.tolist()
+    if unprocessed_cols:
+        print(f"Warning: The following columns are of object type and will be dropped: {unprocessed_cols}")
+        wine_df.drop(columns=unprocessed_cols, inplace=True)
+
+    # Standardize numerical features
+    if numerical_features:
+        scaler = StandardScaler()
+        numerical_data = scaler.fit_transform(wine_df[numerical_features])
+        numerical_sparse = csr_matrix(numerical_data)
+    else:
+        numerical_sparse = None
+
+    # Remaining columns are one-hot encoded categorical features
+    categorical_cols = [col for col in wine_df.columns if col not in numerical_features]
+    if categorical_cols:
+        categorical_data = wine_df[categorical_cols].values.astype(np.float64)
+        categorical_sparse = csr_matrix(categorical_data)
+    else:
+        categorical_sparse = None
+
+    # Combine features
+    feature_list = [X_tfidf]
+    if numerical_sparse is not None:
+        feature_list.append(numerical_sparse)
+    if categorical_sparse is not None:
+        feature_list.append(categorical_sparse)
+    X = hstack(feature_list)
+
+    # Split Data into Training and Validation Sets
     print("Splitting data into training and validation sets...")
     X_train, X_val, y_train, y_val = train_test_split(
-        X_tfidf, y, test_size=0.2, stratify=y, random_state=42
+        X, y, test_size=0.2, stratify=y, random_state=42
     )
 
     return X_train, X_val, y_train, y_val, label_encoder, tfidf_vect
 
-def load_amazon_review_data():
+
+
+
+
+def load_amazon_review_data(data_size=None):
     """Load and preprocess the Amazon review dataset with PCA."""
     train_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv')
     if 'Class' not in train_data:
@@ -189,6 +298,10 @@ def load_amazon_review_data():
 
     X = train_data.drop(columns=['ID', 'Class'])
     y = train_data['Class']
+
+    # Adjust data size if specified
+    if data_size is not None and data_size < len(X):
+        X, y = X.sample(n=data_size, random_state=42), y.sample(n=data_size, random_state=42)
 
     # Encode labels
     label_encoder = LabelEncoder()
@@ -208,9 +321,7 @@ def load_amazon_review_data():
 
     return X_train, X_val, y_train, y_val, label_encoder, None
 
-
-
-def load_congressional_voting_data():
+def load_congressional_voting_data(data_size=None):
     """Load and preprocess the Congressional voting dataset."""
     data = pd.read_csv('data/raw/congressional-voting/CongressionalVotingID.shuf.lrn.csv')
     if 'class' not in data:
@@ -226,11 +337,13 @@ def load_congressional_voting_data():
     # Convert back to DataFrame with original columns
     X_imputed = pd.DataFrame(X_imputed, columns=X.columns)
     
+    # Adjust data size if specified
+    if data_size is not None and data_size < len(X_imputed):
+        X_imputed, y = X_imputed.sample(n=data_size, random_state=42), y.sample(n=data_size, random_state=42)
+    
     # Encode labels
     label_encoder = LabelEncoder()
-    #y_encoded = label_encoder.fit_transform(y)
-    # Ensure y is a 1D array
-    y_encoded = label_encoder.fit_transform(y)#.ravel()
+    y_encoded = label_encoder.fit_transform(y)
 
     X_train, X_val, y_train, y_val = load_and_split_data(X_imputed, y_encoded, stratify=y_encoded)
     
@@ -239,9 +352,7 @@ def load_congressional_voting_data():
     
     return X_train, X_val, y_train, y_val, label_encoder, None
 
-
-
-def load_traffic_data():
+def load_traffic_data(data_size=None):
     """Load and preprocess the traffic dataset."""
     data_dir = 'data/raw/traffic-data/'
     files = ['Traffic.csv', 'TrafficTwoMonth.csv']
@@ -278,6 +389,10 @@ def load_traffic_data():
     categorical_features = ['Day of the week']
     X = pd.get_dummies(X, columns=categorical_features, drop_first=True)
     
+    # Adjust data size if specified
+    if data_size is not None and data_size < len(X):
+        X, y = X.sample(n=data_size, random_state=42), y.sample(n=data_size, random_state=42)
+    
     # Encode labels
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
@@ -290,10 +405,20 @@ def load_traffic_data():
     
     return X_train, X_val, y_train, y_val, label_encoder, None
 
+def load_and_preprocess_data(dataset_name, data_size=None, eval_method='holdout', n_splits=5):
+    """Load and preprocess data based on the dataset name.
 
+    Parameters:
+        dataset_name (str): Name of the dataset to load.
+        data_size (int, optional): Desired number of samples for the dataset.
+        eval_method (str, optional): Evaluation method ('holdout' or 'cross_val').
+        n_splits (int, optional): Number of splits for cross-validation.
 
-def load_and_preprocess_data(dataset_name):
-    """Load and preprocess data based on the dataset name."""
+    Returns:
+        Depending on eval_method:
+            If 'holdout': X_train, X_val, y_train, y_val, label_encoder, tfidf_vect
+            If 'cross_val': X, y, label_encoder, tfidf_vect, cv (cross-validator)
+    """
     loaders = {
         'wine_reviews': load_wine_review_data,
         'amazon_reviews': load_amazon_review_data,
@@ -302,4 +427,23 @@ def load_and_preprocess_data(dataset_name):
     }
     if dataset_name not in loaders:
         raise ValueError("Invalid dataset name provided.")
-    return loaders[dataset_name]()
+
+    # Load data
+    loader = loaders[dataset_name]
+    if eval_method == 'holdout':
+        X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = loader(data_size=data_size)
+        return X_train, X_val, y_train, y_val, label_encoder, tfidf_vect
+    elif eval_method == 'cross_val':
+        # Adjust loaders to return full dataset for cross-validation
+        X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = loader(data_size=data_size)
+        # Concatenate training and validation sets
+        if isinstance(X_train, pd.DataFrame):
+            X = pd.concat([X_train, X_val], ignore_index=True)
+        else:
+            X = np.vstack((X_train, X_val))
+        y = np.hstack((y_train, y_val))
+        # Create cross-validator
+        cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+        return X, y, label_encoder, tfidf_vect, cv
+    else:
+        raise ValueError("Invalid evaluation method. Choose 'holdout' or 'cross_val'.")
