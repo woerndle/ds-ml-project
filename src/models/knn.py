@@ -4,7 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 def get_knn_models():
 
-    neighbors = [3, 5, 7, 10]
+    neighbors = [3, 5, 7, 8, 9, 10, 13]
     weight_functions = ["uniform", "distance"]
     computation_algorithms = ["ball_tree", "kd_tree", "brute"]
     metrics = ["euclidean", "cityblock", "manhattan"]
