@@ -140,18 +140,10 @@ def load_and_split_data(X, y, test_size=0.3, stratify=None, data_size=None):
 
 def load_wine_review_data(data_size=None):
     """Load and preprocess the wine review dataset."""
-
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    processed_file_path = os.path.join(
-        script_dir,
-        "..",
-        "..",
-        "data",
-        "processed",
-        "wine_reviews_processed.csv",
-    )
     # Ensure NLTK resources are available
     nltk.download("punkt", quiet=True)
+
+    processed_file_path = "data/processed/wine_reviews_processed.csv"
     required_columns = [
         "country",
         "description",
@@ -342,17 +334,7 @@ def load_wine_review_data(data_size=None):
 
 def load_amazon_review_data(data_size=None):
     """Load and preprocess the Amazon review dataset with PCA."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    processed_file_path = os.path.join(
-        script_dir,
-        "..",
-        "..",
-        "data",
-        "raw",
-        "amazon-reviews",
-        "amazon_review_ID.shuf.lrn.csv",
-    )
-    train_data = pd.read_csv(processed_file_path)
+    train_data = pd.read_csv("data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv")
     if "Class" not in train_data:
         raise ValueError(
             "The 'Class' column is missing from the Amazon reviews dataset."
@@ -391,18 +373,9 @@ def load_amazon_review_data(data_size=None):
 
 def load_congressional_voting_data(data_size=None):
     """Load and preprocess the Congressional voting dataset."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    processed_file_path = os.path.join(
-        script_dir,
-        "..",
-        "..",
-        "data",
-        "raw",
-        "congressional-voting",
-        "CongressionalVotingID.shuf.lrn.csv",
+    data = pd.read_csv(
+        "data/raw/congressional-voting/CongressionalVotingID.shuf.lrn.csv"
     )
-
-    data = pd.read_csv(processed_file_path)
     if "class" not in data:
         raise ValueError(
             "The 'class' column is missing from the Congressional voting dataset."
@@ -427,6 +400,10 @@ def load_congressional_voting_data(data_size=None):
     # Encode labels
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
+
+    X_train, X_val, y_train, y_val = load_and_split_data(
+        X_imputed, y_encoded, stratify=y_encoded
+    )
 
     # Standardize features
     X_train, X_val = standardize_features(X_train, X_val)
