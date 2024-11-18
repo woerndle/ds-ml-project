@@ -78,9 +78,24 @@ def plot_metrics(df):
 
         for ax, dataset in zip(axes, datasets):
             subset = df[df['dataset'] == dataset]
-            # Sort models by metric value
-            subset = subset.sort_values(by=metric, ascending=False)
-            sns.barplot(x='model', y=metric, data=subset, ax=ax, palette='viridis')
+
+            # Filter top and bottom 3 models for each classifier family
+            families = ['SVC', 'KNN', 'Random Forest']
+            filtered_subset = pd.DataFrame()
+            for family in families:
+                family_subset = subset[subset['model'].str.contains(family, case=False)]
+                top_bottom = pd.concat([
+                    family_subset.nlargest(3, metric),  # Top 3
+                    family_subset.nsmallest(3, metric)  # Bottom 3
+                ])
+                filtered_subset = pd.concat([filtered_subset, top_bottom])
+
+            # Sort by metric for consistent visualization
+            filtered_subset = filtered_subset.sort_values(by=metric, ascending=False)
+
+            # Plot with a uniform color scheme but distinct shading for top/bottom
+            palette = ['#2b83ba' if i < 3 else '#d7191c' for i in range(len(filtered_subset))]
+            sns.barplot(x='model', y=metric, data=filtered_subset, ax=ax, palette=palette)
             ax.set_title(f'{metric} on {dataset}')
             ax.set_xlabel('Model')
             ax.set_ylabel(metric.capitalize())
@@ -95,10 +110,11 @@ def plot_metrics(df):
 
         plt.tight_layout()
         # Save the plot
-        plot_file = os.path.join(plots_dir, f'{metric}_comparison.png')
+        plot_file = os.path.join(plots_dir, f'{metric}_comparison_top_bottom.png')
         plt.savefig(plot_file)
         plt.close()
         print(f"Plot saved: {plot_file}")
+
 
 def main():
     output_dir = 'output_results'

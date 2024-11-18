@@ -2,12 +2,25 @@
 from sklearn.ensemble import RandomForestClassifier
 
 def get_rf_models():
-    # Define Random Forest models with different hyperparameters
-    models = [
-        ("Random Forest (10 estimators)", RandomForestClassifier(n_estimators=10, class_weight='balanced')),
-        ("Random Forest (100 estimators)", RandomForestClassifier(n_estimators=100, class_weight='balanced')),
-        ("Random Forest (max_depth=5)", RandomForestClassifier(max_depth=5, n_estimators=100, class_weight='balanced')),
-        ("Random Forest (min_samples_split=10)", RandomForestClassifier(min_samples_split=10, n_estimators=100, class_weight='balanced')),
-        ("Random Forest (bootstrap=False)", RandomForestClassifier(n_estimators=100, bootstrap=False, class_weight='balanced')),
-    ]
+    n_estimators = [10, 50, 100, 200]
+    max_depths = [None, 5, 10, 20]
+    min_samples_splits = [2, 5, 10]
+    bootstraps = [True, False]
+    models = []
+
+    for n in n_estimators:
+        for max_depth in max_depths:
+            for min_samples_split in min_samples_splits:
+                for bootstrap in bootstraps:
+                    current_model = (
+                        f"RF (n_estimators={n}, max_depth={max_depth}, min_samples_split={min_samples_split}, bootstrap={bootstrap})",
+                        RandomForestClassifier(
+                            n_estimators=n,
+                            max_depth=max_depth,
+                            min_samples_split=min_samples_split,
+                            bootstrap=bootstrap,
+                            class_weight='balanced',
+                        ),
+                    )
+                    models.append(current_model)
     return models
