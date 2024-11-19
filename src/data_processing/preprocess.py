@@ -287,120 +287,146 @@ def load_wine_review_data(data_size=None, eval_method="cross_val"):
         return X_train, X_val, y_train, y_val, label_encoder, tfidf_vect
 
 
-def load_amazon_review_data(data_size=None):
-    """Load and preprocess the Amazon review dataset with PCA."""
-    train_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv')
-    if 'Class' not in train_data:
+def load_amazon_review_data(data_size=None, eval_method="holdout"):
+    """Load and preprocess the Amazon review dataset."""
+    file_path = 'data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv'
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file {file_path} was not found.")
+
+    data = pd.read_csv(file_path)
+    if 'Class' not in data.columns:
         raise ValueError("The 'Class' column is missing from the Amazon reviews dataset.")
 
-    X = train_data.drop(columns=['ID', 'Class'])
-    y = train_data['Class']
+    X = data.drop(columns=['ID', 'Class'])
+    y = data['Class']
 
     # Adjust data size if specified
     if data_size is not None and data_size < len(X):
-        X, y = X.sample(n=data_size, random_state=42), y.sample(n=data_size, random_state=42)
+        X = X.sample(n=data_size, random_state=42)
+        y = y.loc[X.index]
 
     # Encode labels
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
 
-    # Split data
-    X_train, X_val, y_train, y_val = load_and_split_data(X, y_encoded, stratify=y_encoded)
-
     # Standardize features
-    X_train, X_val = standardize_features(X_train, X_val)
+    X = StandardScaler().fit_transform(X)
 
     # Apply PCA
     from sklearn.decomposition import PCA
-    pca = PCA(n_components=100)  # You can adjust this number
-    X_train = pca.fit_transform(X_train)
-    X_val = pca.transform(X_val)
+    pca = PCA(n_components=100)
+    X_pca = pca.fit_transform(X)
 
-    return X_train, X_val, y_train, y_val, label_encoder, None
+    if eval_method == 'holdout':
+        # Split data
+        X_train, X_val, y_train, y_val = load_and_split_data(X_pca, y_encoded, stratify=y_encoded)
+        return X_train, X_val, y_train, y_val, label_encoder, None
+    elif eval_method == 'cross_val':
+        # Return full dataset for cross-validation
+        return X_pca, None, y_encoded, None, label_encoder, None
+    else:
+        raise ValueError("Invalid evaluation method. Choose 'holdout' or 'cross_val'.")
 
-def load_congressional_voting_data(data_size=None):
+def load_congressional_voting_data(data_size=None, eval_method="holdout"):
     """Load and preprocess the Congressional voting dataset."""
-    data = pd.read_csv('data/raw/congressional-voting/CongressionalVotingID.shuf.lrn.csv')
-    if 'class' not in data:
+    file_path = 'data/raw/congressional-voting/CongressionalVotingID.shuf.lrn.csv'
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file {file_path} was not found.")
+
+    data = pd.read_csv(file_path)
+    if 'class' not in data.columns:
         raise ValueError("The 'class' column is missing from the Congressional voting dataset.")
-    
+
     X = data.drop(columns=['ID', 'class']).replace({'y': 1, 'n': 0, 'unknown': np.nan})
     y = data['class']
-    
+
     # Impute missing values
     imputer = SimpleImputer(strategy='most_frequent')
     X_imputed = imputer.fit_transform(X)
-    
-    # Convert back to DataFrame with original columns
-    X_imputed = pd.DataFrame(X_imputed, columns=X.columns)
-    
+
     # Adjust data size if specified
     if data_size is not None and data_size < len(X_imputed):
-        X_imputed, y = X_imputed.sample(n=data_size, random_state=42), y.sample(n=data_size, random_state=42)
-    
+        X_imputed = X_imputed[:data_size]
+        y = y.iloc[:data_size]
+
     # Encode labels
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
 
-    X_train, X_val, y_train, y_val = load_and_split_data(X_imputed, y_encoded, stratify=y_encoded)
-    
     # Standardize features
-    X_train, X_val = standardize_features(X_train, X_val)
-    
-    return X_train, X_val, y_train, y_val, label_encoder, None
+    X_standardized = StandardScaler().fit_transform(X_imputed)
 
-def load_traffic_data(data_size=None):
+    if eval_method == 'holdout':
+        # Split data
+        X_train, X_val, y_train, y_val = load_and_split_data(X_standardized, y_encoded, stratify=y_encoded)
+        return X_train, X_val, y_train, y_val, label_encoder, None
+    elif eval_method == 'cross_val':
+        # Return full dataset for cross-validation
+        return X_standardized, None, y_encoded, None, label_encoder, None
+    else:
+        raise ValueError("Invalid evaluation method. Choose 'holdout' or 'cross_val'.")
+
+def load_traffic_data(data_size=None, eval_method="holdout"):
     """Load and preprocess the traffic dataset."""
     data_dir = 'data/raw/traffic-data/'
     files = ['Traffic.csv', 'TrafficTwoMonth.csv']
-    
-    # Load and combine datasets, checking for duplicates
-    data = pd.concat([pd.read_csv(os.path.join(data_dir, f)) for f in files], ignore_index=True)
-    data = data.drop_duplicates(subset=['Time', 'Date', 'Day of the week'])  # Handle overlapping content
-    
-    # Convert 'Time' to hour (if necessary)
-    if 'Time' in data:
+
+    # Load and combine datasets
+    data_frames = []
+    for file in files:
+        file_path = os.path.join(data_dir, file)
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"The file {file_path} was not found.")
+        df = pd.read_csv(file_path)
+        data_frames.append(df)
+    data = pd.concat(data_frames, ignore_index=True)
+    data.drop_duplicates(subset=['Time', 'Date', 'Day of the week'], inplace=True)
+
+    # Process 'Time' column
+    if 'Time' in data.columns:
         data['Time'] = pd.to_datetime(data['Time'], format='%I:%M:%S %p', errors='coerce').dt.hour
         data['Time'].fillna(data['Time'].mode()[0], inplace=True)
-    
-    # Process 'Date' column to retain only the day of the month
-    if 'Date' in data:
-        data['Day'] = pd.to_numeric(data['Date'], errors='coerce')
-    
-    # Ensure 'Day of the week' is correctly formatted as categorical
-    if 'Day of the week' in data:
+
+    # Process 'Day of the week' column
+    if 'Day of the week' in data.columns:
         data['Day of the week'] = data['Day of the week'].astype(str)
-    
-    # Check for missing values in 'Traffic Situation' column
-    if 'Traffic Situation' not in data:
-        raise ValueError("'Traffic Situation' column is missing from the traffic dataset.")
-    
+
     # Prepare feature and target sets
+    if 'Traffic Situation' not in data.columns:
+        raise ValueError("'Traffic Situation' column is missing from the traffic dataset.")
     X = data.drop(columns=['Traffic Situation', 'Date'])
     y = data['Traffic Situation']
-    
+
     # Handle missing values in X
     X.fillna(X.mode().iloc[0], inplace=True)
-    
-    # Identify categorical features (excluding 'Time')
+
+    # One-hot encode categorical features
     categorical_features = ['Day of the week']
     X = pd.get_dummies(X, columns=categorical_features, drop_first=True)
-    
+
     # Adjust data size if specified
     if data_size is not None and data_size < len(X):
-        X, y = X.sample(n=data_size, random_state=42), y.sample(n=data_size, random_state=42)
-    
+        X = X.sample(n=data_size, random_state=42)
+        y = y.loc[X.index]
+
     # Encode labels
     label_encoder = LabelEncoder()
     y_encoded = label_encoder.fit_transform(y)
-    
-    # Split data into training and validation sets
-    X_train, X_val, y_train, y_val = train_test_split(X, y_encoded, test_size=0.2, stratify=y_encoded, random_state=42)
-    
-    # Feature scaling
-    X_train, X_val = standardize_features(X_train, X_val)
-    
-    return X_train, X_val, y_train, y_val, label_encoder, None
+
+    # Standardize features
+    X_standardized = StandardScaler().fit_transform(X)
+
+    if eval_method == 'holdout':
+        # Split data
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_standardized, y_encoded, test_size=0.2, stratify=y_encoded, random_state=42
+        )
+        return X_train, X_val, y_train, y_val, label_encoder, None
+    elif eval_method == 'cross_val':
+        # Return full dataset for cross-validation
+        return X_standardized, None, y_encoded, None, label_encoder, None
+    else:
+        raise ValueError("Invalid evaluation method. Choose 'holdout' or 'cross_val'.")
 
 def load_and_preprocess_data(dataset_name, data_size=None, eval_method='holdout', n_splits=5):
     """Load and preprocess data based on the dataset name.
@@ -445,7 +471,7 @@ def load_and_preprocess_data(dataset_name, data_size=None, eval_method='holdout'
             else:
                 X = np.vstack((X_train, X_val))
             y = np.hstack((y_train, y_val))
-            
+
         cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
         return X, y, label_encoder, tfidf_vect, cv
     else:
