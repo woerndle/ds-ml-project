@@ -10,10 +10,9 @@ for dataset in "${datasets[@]}"; do
     echo "Running experiments for dataset: $dataset, model: $model"
     python src/experiments/run_experiments.py --dataset "$dataset" --model "$model"
     echo "Completed experiments for dataset: $dataset, model: $model"
-    python src/evaluation/visualisation.py
     echo "Visualisation saved"
     echo "------------------------------------------------------------"
   done
 done
-
+python src/evaluation/visualisation.py
 echo "All experiments completed."

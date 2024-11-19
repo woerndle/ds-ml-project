@@ -279,8 +279,6 @@ def load_wine_review_data(data_size=None):
 
 
 
-
-
 def load_amazon_review_data(data_size=None):
     """Load and preprocess the Amazon review dataset with PCA."""
     train_data = pd.read_csv('data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv')
