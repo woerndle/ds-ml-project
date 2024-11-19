@@ -2,7 +2,7 @@
 
 # Define the datasets and models
 datasets=("wine_reviews" "amazon_reviews" "congressional_voting" "traffic_prediction")
-models=("svm" "knn" "rf")
+models=("rf" "svm" "knn")
 
 # Loop over each dataset and model combination
 for dataset in "${datasets[@]}"; do

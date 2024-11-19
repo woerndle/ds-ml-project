@@ -5,7 +5,7 @@ import numpy as np
 
 def get_svm_models():
     kernels = ["linear", "poly", "rbf", "sigmoid"]
-    degrees = [2, 3, 4]  # For polynomial kernel
+    degrees = [2, 3, 4, 6, 8]  # For polynomial kernel
     Cs = [0.1, 1, 10]  # Regularization parameter
     gammas = ["scale", "auto"]  # Kernel coefficient for RBF/poly/sigmoid
     models = []

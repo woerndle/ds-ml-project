@@ -6,11 +6,11 @@ def get_rf_models():
     n_estimators = [20, 50, 100, 200]
     max_depths = [5, 10, 15]
     min_samples_splits = [2, 5, 10]
-    min_samples_leaf = [1, 2, 4],
+    min_samples_leaf = [1, 2, 4]
     bootstraps = [True, False]
-    max_features = ['sqrt', 'log2'],
-    criterions = ['gini', 'entropy'],
-    class_weights = ['balanced', 'balanced_subsample'],
+    max_features = ['sqrt', 'log2']
+    criterions = ['gini', 'entropy']
+    class_weights = ['balanced', 'balanced_subsample']
     models = []
 
     for n in n_estimators:
