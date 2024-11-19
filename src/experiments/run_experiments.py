@@ -153,113 +153,181 @@ def main():
     parser.add_argument('--dataset', type=str, default='traffic_prediction', help='Dataset name to use.')
     parser.add_argument('--model', type=str, default='knn', choices=['svm', 'knn', 'rf'], help='Model to use.')
     parser.add_argument('--subset', type=int, default=None, help='Use a subset of data for testing.')
+    parser.add_argument('--eval_method', type=str, default='holdout', choices=['holdout', 'cross_val'], help='Evaluation method to use.')
     args = parser.parse_args()
 
     dataset_name = args.dataset
     model_type = args.model
+    eval_method = args.eval_method
 
     # Load and preprocess data
-    X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = load_and_preprocess_data(
-    dataset_name=dataset_name,
-    data_size=1000
-)
-    # Check if X_train is a sparse matrix and convert to CSR format
-    if issparse(X_train):
-        X_train = X_train.tocsr()
-        X_val = X_val.tocsr()
+    data = load_and_preprocess_data(
+        dataset_name=dataset_name,
+        data_size=1000,
+        eval_method=eval_method
+    )
 
-    # Subsampling is deactivated by default
-    if args.subset:
-        pass  
+    if eval_method == 'holdout':
+        X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = data
+        
+        # Check if X_train is a sparse matrix and convert to CSR format
+        if issparse(X_train):
+            X_train = X_train.tocsr()
+            X_val = X_val.tocsr()
 
-    # Convert DataFrames to NumPy arrays to avoid warnings
-    if isinstance(X_train, pd.DataFrame):
-        X_train = X_train.to_numpy()
-    if isinstance(X_val, pd.DataFrame):
-        X_val = X_val.to_numpy()
+        # Convert DataFrames to NumPy arrays to avoid warnings
+        if isinstance(X_train, pd.DataFrame):
+            X_train = X_train.to_numpy()
+        if isinstance(X_val, pd.DataFrame):
+            X_val = X_val.to_numpy()
 
-    # Verify data shapes
-    print(f"X_train shape: {X_train.shape}, should be (n_samples, n_features)")
-    print(f"y_train shape: {y_train.shape}, should be (n_samples,)")
-    print(f"X_val shape: {X_val.shape}, should be (n_samples, n_features)")
-    print(f"y_val shape: {y_val.shape}, should be (n_samples,)")
+        # Verify data shapes
+        print(f"X_train shape: {X_train.shape}, should be (n_samples, n_features)")
+        print(f"y_train shape: {y_train.shape}, should be (n_samples,)")
+        print(f"X_val shape: {X_val.shape}, should be (n_samples, n_features)")
+        print(f"y_val shape: {y_val.shape}, should be (n_samples,)")
 
-    # Select models based on specified type
-    if model_type == 'svm':
-        models = get_svm_models()
-    elif model_type == 'knn':
-        models = get_knn_models()
-    elif model_type == 'rf':
-        models = get_rf_models()
+        # Select models based on specified type
+        if model_type == 'svm':
+            models = get_svm_models()
+        elif model_type == 'knn':
+            models = get_knn_models()
+        elif model_type == 'rf':
+            models = get_rf_models()
 
-    results = []
+        results = []
 
-    # Main training and evaluation loop
-    for model_name, model in tqdm(models, desc=f"Running {model_type} models"):
-        try:
-            # Train the model
-            model.fit(X_train, y_train)
+        # Main training and evaluation loop for holdout
+        for model_name, model in tqdm(models, desc=f"Running {model_type} models"):
+            try:
+                # Train the model
+                model.fit(X_train, y_train)
 
-            # Evaluate the model
-            metrics, y_test_decoded = evaluate_model(model, X_val, y_val, label_encoder)
-            metrics['model_name'] = model_name
-            results.append(metrics)
+                # Evaluate the model
+                metrics, y_test_decoded = evaluate_model(model, X_val, y_val, label_encoder)
+                metrics['model_name'] = model_name
+                results.append(metrics)
 
-            # Generate and save plots using decoded labels
-            y_scores = metrics['y_score']
-            if y_scores is None:
-                print(f"Model {model_name} does not support probability estimates.")
+                # Generate and save plots using decoded labels
+                y_scores = metrics['y_score']
+                if y_scores is None:
+                    print(f"Model {model_name} does not support probability estimates.")
+                    continue
+
+                # Create a directory for the model's output
+                output_dir = os.path.join("output_results", dataset_name, model_name)
+                os.makedirs(output_dir, exist_ok=True)
+
+                # Initialize subplots
+                fig, axes = plt.subplots(2, 3, figsize=(27, 10))
+
+                # Plot Confusion Matrix
+                plot_confusion_matrix(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[0, 0])
+
+                # Plot ROC Curve
+                plot_roc_curve(y_test_decoded, y_scores, model_name, ax=axes[0, 1])
+
+                # Plot Precision-Recall Curve
+                plot_precision_recall_curve(y_test_decoded, y_scores, model_name, ax=axes[0, 2])
+
+                # Plot Classification Report Heatmap
+                plot_classification_report_heatmap(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[1, 0])
+
+                # Plot Decision Boundary (if applicable)
+                try:
+                    plot_decision_boundary(model, X_val, y_val, model_name, ax=axes[1, 1])
+                except Exception as e:
+                    print(f"Decision boundary plot not generated for {model_name}: {e}")
+                    axes[1, 1].set_visible(False)
+
+                # Hide any unused subplots
+                axes[1, 2].set_visible(False)
+
+                # Adjust layout and save the plot
+                plt.tight_layout()
+                plt.savefig(os.path.join(output_dir, f"{model_name}_plots.png"))
+                plt.close()
+
+                # Save individual model results
+                save_metrics(metrics, model_name=model_name, dataset_name=dataset_name)
+
+            except Exception as e:
+                print(f"Error with model {model_name}: {e}")
                 continue
 
-            # Create a directory for the model's output
-            output_dir = os.path.join("output_results", dataset_name, model_name)
-            os.makedirs(output_dir, exist_ok=True)
+        # Save overall results to JSON
+        output_dir = os.path.join("output_results", dataset_name)
+        os.makedirs(output_dir, exist_ok=True)
+        results_file = os.path.join(output_dir, f'results_{dataset_name}_{model_type}.json')
+        with open(results_file, 'w') as f:
+            json.dump(results, f, indent=4)
 
-            # Initialize subplots
-            fig, axes = plt.subplots(2, 3, figsize=(27, 10))
+        print(f"All results saved to {results_file}")
 
-            # Plot Confusion Matrix
-            plot_confusion_matrix(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[0, 0])
+    elif eval_method == 'cross_val':
+        X, y, label_encoder, tfidf_vect, cv = data
 
-            # Plot ROC Curve
-            plot_roc_curve(y_test_decoded, y_scores, model_name, ax=axes[0, 1])
+        # Check if X is a sparse matrix and convert to CSR format
+        if issparse(X):
+            X = X.tocsr()
 
-            # Plot Precision-Recall Curve
-            plot_precision_recall_curve(y_test_decoded, y_scores, model_name, ax=axes[0, 2])
+        # Convert DataFrames to NumPy arrays to avoid warnings
+        if isinstance(X, pd.DataFrame):
+            X = X.to_numpy()
 
-            # Plot Classification Report Heatmap
-            plot_classification_report_heatmap(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[1, 0])
+        # Verify data shapes
+        print(f"X shape: {X.shape}, should be (n_samples, n_features)")
+        print(f"y shape: {y.shape}, should be (n_samples,)")
 
-            # Plot Decision Boundary (if applicable)
+        # Select models based on specified type
+        if model_type == 'svm':
+            models = get_svm_models()
+        elif model_type == 'knn':
+            models = get_knn_models()
+        elif model_type == 'rf':
+            models = get_rf_models()
+
+        results = []
+
+        # Main training and evaluation loop for cross-validation
+        for model_name, model in tqdm(models, desc=f"Running {model_type} models with cross-validation"):
             try:
-                plot_decision_boundary(model, X_val, y_val, model_name, ax=axes[1, 1])
+                from sklearn.model_selection import cross_validate
+
+                # Define scoring metrics
+                scoring = ['accuracy', 'precision_weighted', 'recall_weighted', 'f1_weighted']
+
+                # Perform cross-validation
+                cv_results = cross_validate(model, X, y, cv=cv, scoring=scoring, n_jobs=-1, return_train_score=False)
+
+                # Compute mean and std of metrics
+                metrics = {metric: cv_results['test_' + metric].mean() for metric in scoring}
+                metrics_std = {metric + '_std': cv_results['test_' + metric].std() for metric in scoring}
+
+                # Combine metrics and std
+                metrics.update(metrics_std)
+                metrics['model_name'] = model_name
+
+                results.append(metrics)
+
+                # Save individual model results
+                save_metrics(metrics, model_name=model_name, dataset_name=dataset_name)
+
             except Exception as e:
-                print(f"Decision boundary plot not generated for {model_name}: {e}")
-                axes[1, 1].set_visible(False)
+                print(f"Error with model {model_name}: {e}")
+                continue
 
-            # Hide any unused subplots
-            axes[1, 2].set_visible(False)
+        # Save overall results to JSON
+        output_dir = os.path.join("output_results", dataset_name)
+        os.makedirs(output_dir, exist_ok=True)
+        results_file = os.path.join(output_dir, f'results_{dataset_name}_{model_type}_crossval.json')
+        with open(results_file, 'w') as f:
+            json.dump(results, f, indent=4)
 
-            # Adjust layout and save the plot
-            plt.tight_layout()
-            plt.savefig(os.path.join(output_dir, f"{model_name}_plots.png"))
-            plt.close()
+        print(f"All cross-validation results saved to {results_file}")
 
-            # Save individual model results
-            save_metrics(metrics, model_name=model_name, dataset_name=dataset_name)
-
-        except Exception as e:
-            print(f"Error with model {model_name}: {e}")
-            continue
-
-    # Save overall results to JSON
-    output_dir = os.path.join("output_results", dataset_name)
-    os.makedirs(output_dir, exist_ok=True)
-    results_file = os.path.join(output_dir, f'results_{dataset_name}_{model_type}.json')
-    with open(results_file, 'w') as f:
-        json.dump(results, f, indent=4)
-
-    print(f"All results saved to {results_file}")
+    else:
+        raise ValueError("Invalid evaluation method.")
 
 if __name__ == "__main__":
     main()
