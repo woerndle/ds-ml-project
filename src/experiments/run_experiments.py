@@ -292,26 +292,37 @@ def main():
         # Main training and evaluation loop for cross-validation
         for model_name, model in tqdm(models, desc=f"Running {model_type} models with cross-validation"):
             try:
-                from sklearn.model_selection import cross_validate
+                from sklearn.model_selection import StratifiedKFold
 
-                # Define scoring metrics
-                scoring = ['accuracy', 'precision_weighted', 'recall_weighted', 'f1_weighted']
+                skf = StratifiedKFold(n_splits=cv, shuffle=True, random_state=42)
+                fold_results = []
 
-                # Perform cross-validation
-                cv_results = cross_validate(model, X, y, cv=cv, scoring=scoring, n_jobs=-1, return_train_score=False)
+                for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
+                    # Split data into train and validation sets for this fold
+                    X_train, X_val = X[train_idx], X[val_idx]
+                    y_train, y_val = y[train_idx], y[val_idx]
 
-                # Compute mean and std of metrics
-                metrics = {metric: cv_results['test_' + metric].mean() for metric in scoring}
-                metrics_std = {metric + '_std': cv_results['test_' + metric].std() for metric in scoring}
+                    # Train the model
+                    model.fit(X_train, y_train)
 
-                # Combine metrics and std
-                metrics.update(metrics_std)
-                metrics['model_name'] = model_name
+                    # Evaluate the model using the same `evaluate_model` function as in holdout
+                    metrics, y_test_decoded = evaluate_model(model, X_val, y_val, label_encoder)
+                    metrics['fold'] = fold_idx + 1  # Add fold number to metrics
+                    fold_results.append(metrics)
 
-                results.append(metrics)
+                    # Optionally, save per-fold metrics
+                    save_metrics(metrics, model_name=f"{model_name}_fold{fold_idx + 1}", dataset_name=dataset_name)
 
-                # Save individual model results
-                save_metrics(metrics, model_name=model_name, dataset_name=dataset_name)
+                # Aggregate fold results
+                aggregated_metrics = {
+                    key: np.mean([fold[key] for fold in fold_results if isinstance(fold[key], (int, float))])
+                    for key in fold_results[0] if key not in ['y_score', 'y_pred_decoded']
+                }
+                aggregated_metrics['model_name'] = model_name
+                results.append(aggregated_metrics)
+
+                # Save overall metrics for the model
+                save_metrics(aggregated_metrics, model_name=model_name, dataset_name=dataset_name)
 
             except Exception as e:
                 print(f"Error with model {model_name}: {e}")

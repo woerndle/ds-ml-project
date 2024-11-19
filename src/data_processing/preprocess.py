@@ -476,3 +476,81 @@ def load_and_preprocess_data(dataset_name, data_size=None, eval_method='holdout'
         return X, y, label_encoder, tfidf_vect, cv
     else:
         raise ValueError("Invalid evaluation method. Choose 'holdout' or 'cross_val'.")
+
+
+
+def get_dataset_sample_sizes():
+    """Determine the number of samples for each dataset by reading the raw data files."""
+    sample_sizes = {}
+    
+    # wine_reviews
+    wine_file = 'data/raw/wine-reviews.arff'
+    if os.path.exists(wine_file):
+        with open(wine_file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        data_start = False
+        count = 0
+        for line in lines:
+            if line.strip().lower() == '@data':
+                data_start = True
+                continue
+            if data_start:
+                if line.strip():  # Ignore empty lines
+                    count += 1
+        sample_sizes['wine_reviews'] = count
+    else:
+        print(f"File {wine_file} does not exist.")
+        sample_sizes['wine_reviews'] = None
+    
+    # amazon_reviews
+    amazon_file = 'data/raw/amazon-reviews/amazon_review_ID.shuf.lrn.csv'
+    if os.path.exists(amazon_file):
+        df = pd.read_csv(amazon_file)
+        sample_sizes['amazon_reviews'] = len(df)
+    else:
+        print(f"File {amazon_file} does not exist.")
+        sample_sizes['amazon_reviews'] = None
+    
+    # congressional_voting
+    voting_file = 'data/raw/congressional-voting/CongressionalVotingID.shuf.lrn.csv'
+    if os.path.exists(voting_file):
+        df = pd.read_csv(voting_file)
+        sample_sizes['congressional_voting'] = len(df)
+    else:
+        print(f"File {voting_file} does not exist.")
+        sample_sizes['congressional_voting'] = None
+    
+    # traffic_prediction
+    traffic_dir = 'data/raw/traffic-data/'
+    traffic_files = ['Traffic.csv', 'TrafficTwoMonth.csv']
+    traffic_data = pd.DataFrame()
+    for file in traffic_files:
+        file_path = os.path.join(traffic_dir, file)
+        if os.path.exists(file_path):
+            df = pd.read_csv(file_path)
+            traffic_data = pd.concat([traffic_data, df], ignore_index=True)
+        else:
+            print(f"File {file_path} does not exist.")
+    if not traffic_data.empty:
+        # Remove duplicates based on ['Time', 'Date', 'Day of the week']
+        traffic_data = traffic_data.drop_duplicates(subset=['Time', 'Date', 'Day of the week'])
+        sample_sizes['traffic_prediction'] = len(traffic_data)
+    else:
+        print(f"No traffic data found in {traffic_dir}.")
+        sample_sizes['traffic_prediction'] = None
+    
+    return sample_sizes
+
+def main():
+    """Main function to determine and display dataset sample sizes."""
+    sample_sizes = get_dataset_sample_sizes()
+    print("\nDataset Sample Sizes:")
+    print("---------------------")
+    for dataset, size in sample_sizes.items():
+        if size is not None:
+            print(f"Dataset '{dataset}': {size} samples")
+        else:
+            print(f"Dataset '{dataset}': Sample size could not be determined (file missing)")
+
+if __name__ == "__main__":
+    main()

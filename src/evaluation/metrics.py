@@ -3,7 +3,7 @@ import numpy as np
 import json
 import os
 import time
-import tracemalloc  # Import tracemalloc for memory tracking
+import tracemalloc 
 
 def evaluate_model(model, X_val, y_val, label_encoder):
     """Evaluate the model and return metrics."""
