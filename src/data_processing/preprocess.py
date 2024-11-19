@@ -125,7 +125,7 @@ def load_and_split_data(X, y, test_size=0.3, stratify=None, data_size=None):
         X, _, y, _ = train_test_split(X, y, train_size=data_size, stratify=y, random_state=42)
     return train_test_split(X, y, test_size=test_size, stratify=stratify, random_state=42)
 
-def load_wine_review_data(data_size=None):
+def load_wine_review_data(data_size=None, eval_method="cross_val"):
     """Load and preprocess the wine review dataset."""
     # Ensure NLTK resources are available
     nltk.download('punkt', quiet=True)
@@ -207,13 +207,17 @@ def load_wine_review_data(data_size=None):
     wine_df = wine_df[wine_df['country'].isin(top_countries)]
     print(f"Data shape after selecting top {top_N_countries} countries: {wine_df.shape}")
 
-    # Adjust Data Size with Stratified Sampling
     if data_size is not None and data_size < len(wine_df):
-        # Ensure stratified sampling to maintain class distribution
+        # Calculate samples per class
+        total_classes = wine_df['country'].nunique()
+        samples_per_class = max(2, data_size // total_classes)
+        
+        # Sample data
         wine_df = wine_df.groupby('country', group_keys=False).apply(
-            lambda x: x.sample(min(len(x), data_size // top_N_countries), random_state=42)
+            lambda x: x.sample(min(len(x), samples_per_class), random_state=42)
         ).reset_index(drop=True)
-        # After sampling, remove any classes with less than 2 samples
+        
+        # After sampling, remove any classes with less than min_samples_per_class samples
         country_counts = wine_df['country'].value_counts()
         sufficient_countries = country_counts[country_counts >= min_samples_per_class].index
         wine_df = wine_df[wine_df['country'].isin(sufficient_countries)]
@@ -269,14 +273,20 @@ def load_wine_review_data(data_size=None):
         feature_list.append(categorical_sparse)
     X = hstack(feature_list)
 
-    # Split Data into Training and Validation Sets
-    print("Splitting data into training and validation sets...")
-    X_train, X_val, y_train, y_val = train_test_split(
-        X, y, test_size=0.2, stratify=y, random_state=42
-    )
+    # After creating X and y
+    print(f"Final X shape before splitting: {X.shape}")
+    print(f"Final y shape before splitting: {y.shape}")
 
-    return X_train, X_val, y_train, y_val, label_encoder, tfidf_vect
-
+    # For cross-validation, you can skip splitting
+    if eval_method == 'cross_val':
+        return X, y, label_encoder, tfidf_vect
+    else:
+        # Split Data into Training and Validation Sets
+        print("Splitting data into training and validation sets...")
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, y, test_size=0.2, stratify=y, random_state=42
+        )
+        return X_train, X_val, y_train, y_val, label_encoder, tfidf_vect
 
 
 def load_amazon_review_data(data_size=None):
