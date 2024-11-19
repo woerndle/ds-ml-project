@@ -153,7 +153,7 @@ def main():
     parser.add_argument('--dataset', type=str, default='traffic_prediction', help='Dataset name to use.')
     parser.add_argument('--model', type=str, default='knn', choices=['svm', 'knn', 'rf'], help='Model to use.')
     parser.add_argument('--subset', type=int, default=None, help='Use a subset of data for testing.')
-    parser.add_argument('--eval_method', type=str, default='holdout', choices=['holdout', 'cross_val'], help='Evaluation method to use.')
+    parser.add_argument('--eval_method', type=str, default='cross_val', choices=['holdout', 'cross_val'], help='Evaluation method to use.')
     args = parser.parse_args()
 
     dataset_name = args.dataset
@@ -163,7 +163,7 @@ def main():
     # Load and preprocess data
     data = load_and_preprocess_data(
         dataset_name=dataset_name,
-        data_size=1000,
+        data_size=2976,
         eval_method=eval_method
     )
 

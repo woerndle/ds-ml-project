@@ -273,11 +273,9 @@ def load_wine_review_data(data_size=None, eval_method="cross_val"):
         feature_list.append(categorical_sparse)
     X = hstack(feature_list)
 
-    # After creating X and y
     print(f"Final X shape before splitting: {X.shape}")
     print(f"Final y shape before splitting: {y.shape}")
 
-    # For cross-validation, you can skip splitting
     if eval_method == 'cross_val':
         return X, y, label_encoder, tfidf_vect
     else:
@@ -427,21 +425,27 @@ def load_and_preprocess_data(dataset_name, data_size=None, eval_method='holdout'
     if dataset_name not in loaders:
         raise ValueError("Invalid dataset name provided.")
 
-    # Load data
     loader = loaders[dataset_name]
     if eval_method == 'holdout':
-        X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = loader(data_size=data_size)
+        X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = loader(
+            data_size=data_size,
+            eval_method=eval_method
+        )
         return X_train, X_val, y_train, y_val, label_encoder, tfidf_vect
     elif eval_method == 'cross_val':
-        # Adjust loaders to return full dataset for cross-validation
-        X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = loader(data_size=data_size)
-        # Concatenate training and validation sets
-        if isinstance(X_train, pd.DataFrame):
-            X = pd.concat([X_train, X_val], ignore_index=True)
+        if loader == load_wine_review_data:
+            X, y, label_encoder, tfidf_vect = loader(
+                data_size=data_size,
+                eval_method=eval_method
+            )
         else:
-            X = np.vstack((X_train, X_val))
-        y = np.hstack((y_train, y_val))
-        # Create cross-validator
+            X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = loader(data_size=data_size)
+            if isinstance(X_train, pd.DataFrame):
+                X = pd.concat([X_train, X_val], ignore_index=True)
+            else:
+                X = np.vstack((X_train, X_val))
+            y = np.hstack((y_train, y_val))
+            
         cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
         return X, y, label_encoder, tfidf_vect, cv
     else:
