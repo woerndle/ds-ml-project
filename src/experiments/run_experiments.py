@@ -160,7 +160,7 @@ def main():
 
     # Load and preprocess data
     X_train, X_val, y_train, y_val, label_encoder, tfidf_vect = load_and_preprocess_data(
-    dataset_name='wine_reviews',
+    dataset_name=dataset_name,
     data_size=1000
 )
     # Check if X_train is a sparse matrix and convert to CSR format
