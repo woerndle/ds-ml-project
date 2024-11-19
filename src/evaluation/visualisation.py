@@ -157,8 +157,8 @@ def plot_metrics(df):
     palettes = {
         'SVM': sns.color_palette("Blues", 6)[::-1],
         'RF': sns.color_palette("Greens", 6)[::-1],
-        'KNN': sns.color_palette("Reds", 6)[::-1],
-        'Other': sns.color_palette("Purples", 6)[::-1]
+        'KNN': sns.color_palette("Purples", 6)[::-1],
+        'Other': sns.color_palette("Reds", 6)[::-1]
     }
 
     for metric in metrics_to_plot:
@@ -310,7 +310,7 @@ def main():
         classifier_family = get_classifier_family(top_model_name)
         if classifier_family == 'KNN':
             models_list = get_knn_models()
-        elif classifier_family == 'Random Forest':
+        elif classifier_family == 'RF':
             models_list = get_rf_models()
         elif classifier_family == 'SVM':
             models_list = get_svm_models()
