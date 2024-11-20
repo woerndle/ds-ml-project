@@ -28,6 +28,7 @@ MANIFEST
 output_results/
 output_results_cv/
 output_results_holdout/
+output_results_cross_val/
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.

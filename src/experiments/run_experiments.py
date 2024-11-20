@@ -150,7 +150,7 @@ def plot_decision_boundary(model, X, y, model_name, ax):
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description='Run experiments on a dataset.')
-    parser.add_argument('--dataset', type=str, default='traffic_prediction', help='Dataset name to use.')
+    parser.add_argument('--dataset', type=str, default='congressional_voting', choices=['wine_reviews', 'amazon_reviews', 'congressional_voting', 'traffic_prediction'], help='Dataset name to use.')
     parser.add_argument('--model', type=str, default='svm', choices=['svm', 'knn', 'rf'], help='Model to use.')
     parser.add_argument('--subset', type=int, default=None, help='Use a subset of data for testing.')
     parser.add_argument('--eval_method', type=str, default='cross_val', choices=['holdout', 'cross_val'], help='Evaluation method to use.')
@@ -215,7 +215,7 @@ def main():
                     continue
 
                 # Create a directory for the model's output
-                output_dir = os.path.join("output_results", dataset_name, model_name)
+                output_dir = os.path.join(f"output_results_{eval_method}", dataset_name, model_name)
                 os.makedirs(output_dir, exist_ok=True)
 
                 # Initialize subplots
@@ -255,14 +255,14 @@ def main():
                 print(f"Error with model {model_name}: {e}")
                 continue
 
-        # Save overall results to JSON
-        output_dir = os.path.join("output_results", dataset_name)
-        os.makedirs(output_dir, exist_ok=True)
-        results_file = os.path.join(output_dir, f'results_{dataset_name}_{model_type}.json')
-        with open(results_file, 'w') as f:
-            json.dump(results, f, indent=4)
+        # # Save overall results to JSON
+        # output_dir = os.path.join("output_results", dataset_name)
+        # os.makedirs(output_dir, exist_ok=True)
+        # results_file = os.path.join(output_dir, f'results_{dataset_name}_{model_type}.json')
+        # with open(results_file, 'w') as f:
+        #     json.dump(results, f, indent=4)
 
-        print(f"All results saved to {results_file}")
+        print(f"All results saved")
 
     elif eval_method == 'cross_val':
         X, y, label_encoder, tfidf_vect, cv = data  # Ensure cv is a StratifiedKFold object
@@ -307,33 +307,77 @@ def main():
                     metrics['fold'] = fold_idx + 1  # Add fold number to metrics
                     fold_results.append(metrics)
 
+                    # Assign y_scores from metrics
+                    y_scores = metrics['y_score']
+                    if y_scores is None:
+                        print(f"Model {model_name} does not support probability estimates in fold {fold_idx + 1}.")
+                        continue  # Skip plotting for this fold
+
+
+                    # Generate and save plots for each fold
+                    output_dir = os.path.join(f"output_results_{eval_method}", dataset_name, model_name, f"fold{fold_idx + 1}")
+                    os.makedirs(output_dir, exist_ok=True)
+
+                    # Initialize subplots
+                    fig, axes = plt.subplots(2, 3, figsize=(27, 10))
+
+                    # Plot Confusion Matrix
+                    plot_confusion_matrix(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[0, 0])
+
+                    # Plot ROC Curve
+                    plot_roc_curve(y_test_decoded, y_scores, model_name, ax=axes[0, 1])
+
+                    # Plot Precision-Recall Curve
+                    plot_precision_recall_curve(y_test_decoded, y_scores, model_name, ax=axes[0, 2])
+
+                    # Plot Classification Report Heatmap
+                    plot_classification_report_heatmap(y_test_decoded, metrics['y_pred_decoded'], model_name, ax=axes[1, 0])
+
+                    # Plot Decision Boundary (if applicable)
+                    try:
+                        plot_decision_boundary(model, X_val, y_val, model_name, ax=axes[1, 1])
+                    except Exception as e:
+                        print(f"Decision boundary plot not generated for {model_name}: {e}")
+                        axes[1, 1].set_visible(False)
+
+                    # Hide any unused subplots
+                    axes[1, 2].set_visible(False)
+
+                    # Adjust layout and save the plot
+                    plt.tight_layout()
+                    plt.savefig(os.path.join(output_dir, f"{model_name}_plots.png"))
+                    plt.close()
+
+
                     # Optionally, save per-fold metrics
-                    save_metrics(metrics, model_name=f"{model_name}_fold{fold_idx + 1}", dataset_name=dataset_name, eval_method=eval_method)
+                    save_metrics(metrics, model_name=model_name, dataset_name=dataset_name, eval_method=eval_method, fold=fold_idx + 1)
 
                 # Aggregate fold results
                 aggregated_metrics = {
                     key: np.mean([fold[key] for fold in fold_results if isinstance(fold[key], (int, float))])
-                    for key in fold_results[0] if key not in ['y_score', 'y_pred_decoded', 'model_params']
+                    for key in fold_results[0]
+                    if key not in ['y_score', 'y_pred_decoded', 'model_params', 'classification_report', 'fold']
                 }
                 aggregated_metrics['model_name'] = model_name
-                aggregated_metrics['model_params'] = fold_results[0]['model_params']  # Assuming all folds have the same params
+                aggregated_metrics['model_params'] = fold_results[0]['model_params']
+                # Optionally, collect classification reports per fold
+                aggregated_metrics['classification_reports'] = [fold['classification_report'] for fold in fold_results]
                 results.append(aggregated_metrics)
-
                 # Save overall metrics for the model
-                save_metrics(aggregated_metrics, model_name=model_name, dataset_name=dataset_name)
+                save_metrics(aggregated_metrics, model_name=model_name, dataset_name=dataset_name, eval_method=eval_method)
 
             except Exception as e:
                 print(f"Error with model {model_name}: {e}")
                 continue
 
-        # Save overall results to JSON
-        output_dir = os.path.join("output_results", dataset_name)
-        os.makedirs(output_dir, exist_ok=True)
-        results_file = os.path.join(output_dir, f'results_{dataset_name}_{model_type}_crossval.json')
-        with open(results_file, 'w') as f:
-            json.dump(results, f, indent=4)
+        # # Save overall results to JSON
+        # output_dir = os.path.join("output_results", dataset_name)
+        # os.makedirs(output_dir, exist_ok=True)
+        # results_file = os.path.join(output_dir, f'results_{dataset_name}_{model_type}_crossval.json')
+        # with open(results_file, 'w') as f:
+        #     json.dump(results, f, indent=4)
 
-        print(f"All cross-validation results saved to {results_file}")
+        print(f"All cross-validation results saved")
     else:
         raise ValueError("Invalid evaluation method.")
 
