@@ -249,7 +249,7 @@ def main():
                 plt.close()
 
                 # Save individual model results
-                save_metrics(metrics, model_name=model_name, dataset_name=dataset_name)
+                save_metrics(metrics, model_name=model_name, dataset_name=dataset_name, eval_method=eval_method)
 
             except Exception as e:
                 print(f"Error with model {model_name}: {e}")
@@ -308,7 +308,7 @@ def main():
                     fold_results.append(metrics)
 
                     # Optionally, save per-fold metrics
-                    save_metrics(metrics, model_name=f"{model_name}_fold{fold_idx + 1}", dataset_name=dataset_name)
+                    save_metrics(metrics, model_name=f"{model_name}_fold{fold_idx + 1}", dataset_name=dataset_name, eval_method=eval_method)
 
                 # Aggregate fold results
                 aggregated_metrics = {

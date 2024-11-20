@@ -68,8 +68,10 @@ def evaluate_model(model, X_val, y_val, label_encoder):
     }
     return metrics, y_test_decoded
 
-def save_metrics(metrics, model_name, dataset_name):
-    output_dir = os.path.join("output_results", dataset_name, model_name)
+def save_metrics(metrics, model_name, dataset_name, eval_method):
+       
+    output_dir = os.path.join(f"output_results_{eval_method}", dataset_name, model_name)
+
     os.makedirs(output_dir, exist_ok=True)
     results_file = os.path.join(output_dir, f"{model_name}_metrics.json")
 
