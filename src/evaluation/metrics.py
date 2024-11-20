@@ -59,7 +59,7 @@ def evaluate_model(model, X_val, y_val, label_encoder):
     # Calculate metrics
     metrics = {
         'accuracy': accuracy_score(y_val, y_pred),
-        'classification_report': classification_report(y_val, y_pred),
+        'classification_report': classification_report(y_val, y_pred, output_dict=True),
         'y_score': y_scores,
         'y_pred_decoded': y_pred_decoded,
         'elapsed_time_seconds': elapsed_time,  # Add elapsed time to metrics
@@ -68,25 +68,16 @@ def evaluate_model(model, X_val, y_val, label_encoder):
     }
     return metrics, y_test_decoded
 
-def save_metrics(metrics, model_name, dataset_name, eval_method):
-       
-    output_dir = os.path.join(f"output_results_{eval_method}", dataset_name, model_name)
-
+def save_metrics(metrics, model_name, dataset_name, eval_method, fold=None):
+    if fold is not None:
+        output_dir = os.path.join(f"output_results_{eval_method}", dataset_name, model_name, f"fold{fold}")
+    else:
+        output_dir = os.path.join(f"output_results_{eval_method}", dataset_name, model_name)
     os.makedirs(output_dir, exist_ok=True)
     results_file = os.path.join(output_dir, f"{model_name}_metrics.json")
-
-    # Convert any NumPy arrays to lists before saving
-    for key in metrics:
-        if isinstance(metrics[key], np.ndarray):
-            metrics[key] = metrics[key].tolist()
-        elif isinstance(metrics[key], dict):
-            # If any values in the dict are NumPy arrays, convert them
-            for sub_key in metrics[key]:
-                if isinstance(metrics[key][sub_key], np.ndarray):
-                    metrics[key][sub_key] = metrics[key][sub_key].tolist()
-        elif isinstance(metrics[key], list):
-            # If any items in the list are NumPy arrays, convert them
-            metrics[key] = [item.tolist() if isinstance(item, np.ndarray) else item for item in metrics[key]]
-
+    
+    # Convert any NumPy types to native Python types
+    metrics = json.loads(json.dumps(metrics, default=lambda o: o.tolist() if isinstance(o, np.ndarray) else o))
+    
     with open(results_file, "w") as f:
-        json.dump(metrics, f, indent=4)
+        json.dump(metrics, f, indent=4)        
