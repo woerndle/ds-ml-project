@@ -29,7 +29,7 @@ def get_svm_models():
 
     # Add LinearSVC and calibrated LinearSVC separately
     models.append(
-        ("Calibrated LinearSVC", CalibratedClassifierCV(LinearSVC(C=1, max_iter=1000, class_weight='balanced')))
+        ("SVC Calibrated LinearSVC", CalibratedClassifierCV(LinearSVC(C=1, max_iter=1000, class_weight='balanced')))
     )
 
     return models

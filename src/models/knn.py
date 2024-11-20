@@ -16,7 +16,7 @@ def get_knn_models():
             for metric in metrics:
                 for number_of_neigbors in neighbors:
                     current_model = (
-                        f"KNN, ({weight_function}, {computation_algorithm}, {metric} ,k={number_of_neigbors})",
+                        f"KNN ({weight_function}, {computation_algorithm}, {metric} ,k={number_of_neigbors})",
                         KNeighborsClassifier(
                             n_neighbors=number_of_neigbors,
                             algorithm=computation_algorithm,

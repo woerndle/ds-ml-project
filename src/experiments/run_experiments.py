@@ -151,7 +151,7 @@ def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description='Run experiments on a dataset.')
     parser.add_argument('--dataset', type=str, default='traffic_prediction', help='Dataset name to use.')
-    parser.add_argument('--model', type=str, default='knn', choices=['svm', 'knn', 'rf'], help='Model to use.')
+    parser.add_argument('--model', type=str, default='svm', choices=['svm', 'knn', 'rf'], help='Model to use.')
     parser.add_argument('--subset', type=int, default=None, help='Use a subset of data for testing.')
     parser.add_argument('--eval_method', type=str, default='cross_val', choices=['holdout', 'cross_val'], help='Evaluation method to use.')
     args = parser.parse_args()
@@ -265,7 +265,7 @@ def main():
         print(f"All results saved to {results_file}")
 
     elif eval_method == 'cross_val':
-        X, y, label_encoder, tfidf_vect, cv = data
+        X, y, label_encoder, tfidf_vect, cv = data  # Ensure cv is a StratifiedKFold object
 
         # Check if X is a sparse matrix and convert to CSR format
         if issparse(X):
@@ -292,12 +292,9 @@ def main():
         # Main training and evaluation loop for cross-validation
         for model_name, model in tqdm(models, desc=f"Running {model_type} models with cross-validation"):
             try:
-                from sklearn.model_selection import StratifiedKFold
-
-                skf = StratifiedKFold(n_splits=cv, shuffle=True, random_state=42)
                 fold_results = []
 
-                for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
+                for fold_idx, (train_idx, val_idx) in enumerate(cv.split(X, y)):
                     # Split data into train and validation sets for this fold
                     X_train, X_val = X[train_idx], X[val_idx]
                     y_train, y_val = y[train_idx], y[val_idx]
@@ -316,9 +313,10 @@ def main():
                 # Aggregate fold results
                 aggregated_metrics = {
                     key: np.mean([fold[key] for fold in fold_results if isinstance(fold[key], (int, float))])
-                    for key in fold_results[0] if key not in ['y_score', 'y_pred_decoded']
+                    for key in fold_results[0] if key not in ['y_score', 'y_pred_decoded', 'model_params']
                 }
                 aggregated_metrics['model_name'] = model_name
+                aggregated_metrics['model_params'] = fold_results[0]['model_params']  # Assuming all folds have the same params
                 results.append(aggregated_metrics)
 
                 # Save overall metrics for the model
@@ -336,7 +334,6 @@ def main():
             json.dump(results, f, indent=4)
 
         print(f"All cross-validation results saved to {results_file}")
-
     else:
         raise ValueError("Invalid evaluation method.")
 

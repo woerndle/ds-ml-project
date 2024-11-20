@@ -5,6 +5,22 @@ import os
 import time
 import tracemalloc 
 
+from sklearn.base import BaseEstimator
+import numpy as np
+
+def serialize_params(params):
+    serializable_params = {}
+    for k, v in params.items():
+        if isinstance(v, BaseEstimator):
+            continue  # Skip model objects
+        elif isinstance(v, dict):
+            serializable_params[k] = serialize_params(v)
+        elif isinstance(v, list):
+            serializable_params[k] = [serialize_params(item) if isinstance(item, dict) else item for item in v]
+        else:
+            serializable_params[k] = v
+    return serializable_params
+
 def evaluate_model(model, X_val, y_val, label_encoder):
     """Evaluate the model and return metrics."""
     # Start tracking time and memory
@@ -13,6 +29,9 @@ def evaluate_model(model, X_val, y_val, label_encoder):
     
     # Predict on validation data
     y_pred = model.predict(X_val)
+    
+    # Get model parameters and exclude any model objects
+    params = serialize_params(model.get_params())
     
     # Stop tracking memory and time
     current, peak = tracemalloc.get_traced_memory()  # Get current and peak memory usage
@@ -32,7 +51,7 @@ def evaluate_model(model, X_val, y_val, label_encoder):
             y_scores = np.vstack([-y_scores, y_scores]).T
     else:
         y_scores = None  # Some models do not provide probabilities or scores
-
+    
     # Decode labels if necessary
     y_test_decoded = label_encoder.inverse_transform(y_val)
     y_pred_decoded = label_encoder.inverse_transform(y_pred)
@@ -45,6 +64,7 @@ def evaluate_model(model, X_val, y_val, label_encoder):
         'y_pred_decoded': y_pred_decoded,
         'elapsed_time_seconds': elapsed_time,  # Add elapsed time to metrics
         'peak_memory_usage_mb': peak_memory_mb,  # Add peak memory usage to metrics
+        'model_params': params,  # Add model parameters to metrics
     }
     return metrics, y_test_decoded
 
@@ -57,8 +77,14 @@ def save_metrics(metrics, model_name, dataset_name):
     for key in metrics:
         if isinstance(metrics[key], np.ndarray):
             metrics[key] = metrics[key].tolist()
+        elif isinstance(metrics[key], dict):
+            # If any values in the dict are NumPy arrays, convert them
+            for sub_key in metrics[key]:
+                if isinstance(metrics[key][sub_key], np.ndarray):
+                    metrics[key][sub_key] = metrics[key][sub_key].tolist()
+        elif isinstance(metrics[key], list):
+            # If any items in the list are NumPy arrays, convert them
+            metrics[key] = [item.tolist() if isinstance(item, np.ndarray) else item for item in metrics[key]]
 
     with open(results_file, "w") as f:
         json.dump(metrics, f, indent=4)
-
-    print(f"Metrics saved to {results_file}")
