@@ -1,6 +1,6 @@
 # ds-ml-project
 
-Data Science TU Wien Machine Learning Project
+Data Science TU Wien Machine Learning Project (Group 42)
 
 ## Overview
 
@@ -64,8 +64,32 @@ Supported evaluation methods:
 
 ## Repository Structure
 
-ds-ml-project/ ├── data/ │ ├── raw/ │ │ ├── amazon-reviews/ │ │ ├── congressional-voting/ │ │ ├── traffic-data/ │ │ └── wine-reviews.arff │ └── processed/ │ └── wine_reviews_processed.csv ├── output_results_holdout/ ├── output_results_cross_val/ ├── plots/ ├── run_all_experiments.sh ├── src/ │ ├── data_processing/ │ │ └── preprocess.py │ ├── evaluation/ │ │ ├── metrics.py │ │ └── visualisation.py │ ├── experiments/ │ │ └── run_experiments.py │ └── models/ │ ├── knn.py │ ├── random_forest.py │ └── svm.py └── README.md
-
+ds-ml-project/
+├── data/
+│ ├── raw/
+│ │ ├── amazon-reviews/
+│ │ ├── congressional-voting/
+│ │ ├── traffic-data/
+│ │ └── wine-reviews.arff
+│ └── processed/
+│ └── wine_reviews_processed.csv
+├── output_results_holdout/
+├── output_results_cross_val/
+├── plots/
+├── run_all_experiments.sh
+├── src/
+│ ├── data_processing/
+│ │ └── preprocess.py
+│ ├── evaluation/
+│ │ ├── metrics.py
+│ │ └── visualisation.py
+│ ├── experiments/
+│ │ └── run_experiments.py
+│ └── models/
+│ ├── knn.py
+│ ├── random_forest.py
+│ └── svm.py
+└── README.md
 
 
 
@@ -84,106 +108,83 @@ ds-ml-project/ ├── data/ │ ├── raw/ │ │ ├── amazon-revie
 
 ### Prerequisites
 
-- **Python 3.x**
+- Python 3.x
 - Required Python packages (see `requirements.txt` if available)
-- **NLTK data packages**: WordNet, stopwords, etc.
+- NLTK data packages: WordNet, stopwords, etc.
 
 ### Setup
 
-1. **Clone the repository**:
-
+1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/ds-ml-project.git
+   git clone https://github.com/woerndle/ds-ml-project.git
    cd ds-ml-project
-Install the required Python packages:
 
-It's recommended to use a virtual environment.
+2. Install the required Python packages:
+   ```
+    pip install -r requirements.txt
 
+3. Download NLTK data:
+   ```
+   this is done via code
 
+### Running Experiments
 
-pip install -r requirements.txt
-Download NLTK data:
+To reproduce the results, execute the script:
+   ```
+   chmod +x run_all_experiments.sh
+   ./run_all_experiments.sh
+```
 
-The scripts automatically download NLTK data if not present. Ensure internet connectivity for the first run.
+### Custom Experiments
 
-Running Experiments
-To reproduce the results, execute the run_all_experiments.sh script. This script runs experiments for all combinations of datasets, models, and evaluation methods.
-
-Navigate to the root directory in your terminal and execute:
-
-
-
-./run_all_experiments.sh
-Note: Running all experiments can be time-consuming, especially with large datasets. To reduce execution time, you can limit the amount of data used by adjusting the data_size parameter in run_experiments.py.
-
-Adjusting Data Size
-To use a reduced amount of data, modify the data_size parameter in the main function in run_experiments.py. For example, set data_size=10000 to use 10,000 samples per dataset.
-
-Visualizing Results
-After running experiments, results are saved in the output_results_holdout/ and output_results_cross_val/ directories. To generate summary visualizations, run the visualization script:
+Run custom experiments with specific arguments:
 
 
+## Detailed Description
 
-python src/evaluation/visualisation.py
-This will create plots and summary tables in the plots/ directory.
+### Data Processing
 
-Custom Experiments
-You can run custom experiments by directly calling run_experiments.py with specific arguments.
+- Loading Datasets: From various formats like CSV and ARFF.
+- Handling Missing Values: Data imputation and cleaning.
+- Text Preprocessing: Tokenization, lemmatization, and stopword removal for textual data.
+- Feature Encoding: Label encoding and one-hot encoding for categorical features.
+- Feature Scaling: Standardization of numerical features.
+- Dimensionality Reduction: Using PCA for high-dimensional data.
+- Data Splitting: Into training and validation sets or preparing for cross-validation.
 
-Example:
+### Models
 
+- **SVM (svm.py)**: Defines SVM models with various kernels and hyperparameters.
+- **KNN (knn.py)**: Defines KNN models with different configurations.
+- **Random Forest (random_forest.py)**: Defines Random Forest models with varying hyperparameters.
 
+### Experiment Running
 
-python src/experiments/run_experiments.py --dataset wine_reviews --model svm --eval_method cross_val
-Available arguments:
+- Argument Parsing: Determines dataset, model, evaluation method, and subset size.
+- Data Loading: Calls preprocessing functions to load and prepare data.
+- Model Retrieval: Gets the list of models based on the specified type.
+- Training and Evaluation: Trains models and evaluates them using the specified evaluation method.
+- Result Saving: Saves metrics and generates plots for each model.
 
---dataset: Name of the dataset (wine_reviews, amazon_reviews, congressional_voting, traffic_prediction)
---model: Model to use (svm, knn, rf)
---eval_method: Evaluation method (holdout, cross_val)
---subset: Use a subset of data for testing (e.g., --subset 1000)
-Detailed Description
-Data Processing
-The preprocess.py script in src/data_processing/ handles loading and preprocessing of datasets. This includes:
+### Evaluation and Metrics
 
-Loading Datasets: From various formats like CSV and ARFF.
-Handling Missing Values: Data imputation and cleaning.
-Text Preprocessing: Tokenization, lemmatization, and stopword removal for textual data.
-Feature Encoding: Label encoding and one-hot encoding for categorical features.
-Feature Scaling: Standardization of numerical features.
-Dimensionality Reduction: Using PCA for high-dimensional data.
-Data Splitting: Into training and validation sets or preparing for cross-validation.
-Models
-The models are defined in the src/models/ directory.
+- Metrics Calculation: Accuracy, F1-score, confusion matrix, ROC curve, etc.
+- Performance Tracking: Measures elapsed time and memory usage.
+- Result Serialization: Saves metrics to JSON files for analysis.
 
-SVM (svm.py)
-Defines SVM models with various kernels and hyperparameters.
+### Visualization
 
-KNN (knn.py)
-Defines KNN models with different configurations.
+- Data Collection: Gathers metrics from result directories.
+- Plot Generation: Creates plots like box plots, scatter plots, and bar charts.
+- Summary Tables: Generates tables summarizing model performance.
+- Output: Saves plots and tables in the plots/ directory.
 
-Random Forest (random_forest.py)
-Defines Random Forest models with varying hyperparameters.
+## Contributing
 
-Experiment Running
-The run_experiments.py script orchestrates the running of experiments.
-
-Argument Parsing: Determines dataset, model, evaluation method, and subset size.
-Data Loading: Calls preprocessing functions to load and prepare data.
-Model Retrieval: Gets the list of models based on the specified type.
-Training and Evaluation: Trains models and evaluates them using the specified evaluation method.
-Result Saving: Saves metrics and generates plots for each model.
-Evaluation and Metrics
-The metrics.py script in src/evaluation/ handles model evaluation.
-
-Metrics Calculation: Accuracy, F1-score, confusion matrix, ROC curve, etc.
-Performance Tracking: Measures elapsed time and memory usage.
-Result Serialization: Saves metrics to JSON files for analysis.
-Visualization
-The visualisation.py script in src/evaluation/ generates visualizations.
-
-Data Collection: Gathers metrics from result directories.
-Plot Generation: Creates plots like box plots, scatter plots, and bar charts.
-Summary Tables: Generates tables summarizing model performance.
-Output: Saves plots and tables in the plots/ directory.
-Contributing
 If you wish to contribute to this project, please fork the repository and submit a pull request.
+
+## License
+
+[MIT License](LICENSE)
+
+THIS README WAS CREATED BY A LANGUAGE MODEL. IT WAS PRESENTED THE CODEBASE AND TAKSED WITH CREATING THIS FILE
