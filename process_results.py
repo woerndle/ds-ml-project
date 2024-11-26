@@ -4,36 +4,68 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import f1_score
 import re
 
 def parse_model_name(model_name):
     """
     Extracts the classifier family and hyperparameters from the model name.
     """
-    pattern = r'^(.*?)(?: \((.*)\))?$'
+    # First, extract the classifier family and parameters
+    pattern = r'^(.*?)\s*\((.*)\)$'
     match = re.match(pattern, model_name)
     if match:
         family = match.group(1).strip()
         params_str = match.group(2)
-        if params_str:
-            params_list = params_str.split(', ')
-            hyperparameters = {}
-            for param in params_list:
-                if '=' in param:
-                    key, value = param.split('=', 1)
-                    key = key.strip()
-                    value = value.strip('"')
-                    hyperparameters[key] = value
-                else:
-                    hyperparameters[param] = True  # Treat as a flag
-        else:
-            hyperparameters = {}
+        # Now, extract the hyperparameters
+        params_list = re.split(r',\s*', params_str)
+        hyperparameters = {}
+        for param in params_list:
+            if '=' in param:
+                key, value = param.split('=', 1)
+                hyperparameters[key.strip()] = value.strip()
+            else:
+                # For positional parameters (e.g., KNN), store as positional arguments
+                if 'positional' not in hyperparameters:
+                    hyperparameters['positional'] = []
+                hyperparameters['positional'].append(param.strip())
     else:
-        family = model_name
+        # Model name without parameters
+        family = model_name.strip()
         hyperparameters = {}
     return family, hyperparameters
+
+def generate_abbreviated_model_name(model_name):
+    """
+    Generates an abbreviated model name based on the full model name.
+    """
+    family, hyperparameters = parse_model_name(model_name)
+
+    # Now, generate abbreviation based on classifier
+    if family == 'SVC':
+        kernel = hyperparameters.get('kernel', '')
+        C = hyperparameters.get('C', '')
+        if kernel == 'poly':
+            degree = hyperparameters.get('degree', '')
+            abbrev = f"SVC-ply-d{degree}-C{C}"
+        else:
+            abbrev = f"SVC-{kernel[:3]}-C{C}"
+    elif family == 'RF':
+        n_estimators = hyperparameters.get('n_estimators', '')
+        max_depth = hyperparameters.get('max_depth', '')
+        abbrev = f"RF-n{n_estimators}-d{max_depth}"
+    elif family == 'KNN':
+        positional_params = hyperparameters.get('positional', [])
+        if len(positional_params) >= 3:
+            weights = positional_params[0][:1]  # First letter of weights
+            algorithm = positional_params[1][:1]  # First letter of algorithm
+            metric = positional_params[2][:1]  # First letter of metric
+            k = hyperparameters.get('k', '')
+            abbrev = f"KNN-{weights}{algorithm}{metric}-k{k}"
+        else:
+            abbrev = family
+    else:
+        abbrev = family
+    return abbrev
 
 def load_metrics(file_path):
     """
@@ -62,6 +94,7 @@ def collect_holdout_data(root_dir):
                         'Method': 'Holdout',
                         'Dataset': dataset,
                         'Classifier': family,
+                        'Model_Name': model_folder,  # Include the full model name
                         'Hyperparameters': hyperparams,
                         'Accuracy': metrics['accuracy'],
                         'F1_Score': metrics['classification_report']['weighted avg']['f1-score'],
@@ -104,6 +137,7 @@ def collect_crossval_data(root_dir):
                     'Method': 'Cross-Validation',
                     'Dataset': dataset,
                     'Classifier': family,
+                    'Model_Name': model_folder,  # Include the full model name
                     'Hyperparameters': hyperparams,
                     'Accuracy': accuracy,
                     'F1_Score': f1_scores,
@@ -136,6 +170,9 @@ if __name__ == "__main__":
 
     # Handle missing values if any
     df.fillna(method='ffill', inplace=True)
+
+    # Generate abbreviated model names
+    df['Abbrev_Model_Name'] = df['Model_Name'].apply(generate_abbreviated_model_name)
 
     # Group by Method, Dataset, Classifier
     summary = df.groupby(['Method', 'Dataset', 'Classifier']).agg(
@@ -251,7 +288,7 @@ if __name__ == "__main__":
     datasets.sort()
 
     # Create 2x2 subplot grid
-    fig, axs = plt.subplots(2, 2, figsize=(20, 15))  # Increased figure width
+    fig, axs = plt.subplots(2, 2, figsize=(15, 10))
 
     classifier_families = ['KNN', 'RF', 'SVC']
 
@@ -281,19 +318,7 @@ if __name__ == "__main__":
             selected = selected.copy().reset_index(drop=True)
             # Assign colors
             selected['Color'] = color_palettes[clf]
-            # Generate Model_Name with line breaks
-            def generate_model_name(row):
-                clf = row['Classifier']
-                if clf == 'KNN':
-                    name = f"{clf}\nn_neighbors={row.get('n_neighbors', '')}"
-                elif clf == 'RF':
-                    name = f"{clf}\nn_estimators={row.get('n_estimators', '')}\nmax_depth={row.get('max_depth', '')}"
-                elif clf == 'SVC':
-                    name = f"{clf}\nC={row.get('C', '')}\nkernel={row.get('kernel', '')}"
-                else:
-                    name = clf
-                return name
-            selected['Model_Name'] = selected.apply(generate_model_name, axis=1)
+            # Use abbreviated model names
             selected_models = pd.concat([selected_models, selected])
 
         # Now plot
@@ -303,19 +328,15 @@ if __name__ == "__main__":
         x = np.arange(len(selected_models))
         y = selected_models['F1_Score']
         colors = selected_models['Color']
-        labels = selected_models['Model_Name']
+        labels = selected_models['Abbrev_Model_Name']
 
         ax.bar(x, y, color=colors)
         ax.set_title(f'Dataset: {dataset}')
         ax.set_xticks(x)
-        ax.set_xticklabels(labels, rotation=0, fontsize=10, ha='center')  # Keep labels horizontal
+        ax.set_xticklabels(labels, rotation=90)
         ax.set_ylabel('F1_Score')
 
-        # Adjust x-axis label positions if necessary
-        for tick in ax.get_xticklabels():
-            tick.set_y(-0.02)  # Slightly adjust the label position
-
-    # Adjust layout to prevent clipping of tick-labels
-    plt.tight_layout(rect=[0, 0.05, 1, 1])  # Adjust the bottom margin
+    # Adjust layout and save figure
+    plt.tight_layout()
     plt.savefig(os.path.join(output_plot_dir, 'top_bottom_models_bar_charts.png'))
     plt.show()
