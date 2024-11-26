@@ -8,61 +8,80 @@ import re
 
 def parse_model_name(model_name):
     """
-    Extracts the classifier family and hyperparameters from the model name.
+    Extracts the classifier family from the model name.
     """
-    # First, extract the classifier family and parameters
-    pattern = r'^(.*?)\s*\((.*)\)$'
-    match = re.match(pattern, model_name)
-    if match:
-        family = match.group(1).strip()
-        params_str = match.group(2)
-        # Now, extract the hyperparameters
-        params_list = re.split(r',\s*', params_str)
-        hyperparameters = {}
-        for param in params_list:
-            if '=' in param:
-                key, value = param.split('=', 1)
-                hyperparameters[key.strip()] = value.strip()
-            else:
-                # For positional parameters (e.g., KNN), store as positional arguments
-                if 'positional' not in hyperparameters:
-                    hyperparameters['positional'] = []
-                hyperparameters['positional'].append(param.strip())
+    model_name = model_name.strip()
+    if model_name.startswith('SVC'):
+        family = 'SVC'
+    elif model_name.startswith('RF'):
+        family = 'RF'
+    elif model_name.startswith('KNN'):
+        family = 'KNN'
     else:
-        # Model name without parameters
-        family = model_name.strip()
-        hyperparameters = {}
-    return family, hyperparameters
+        family = 'Other'
+    return family
 
-def generate_abbreviated_model_name(model_name):
+def generate_abbreviated_model_name(row):
     """
-    Generates an abbreviated model name based on the full model name.
+    Generates an abbreviated model name based on the classifier family and hyperparameters.
     """
-    family, hyperparameters = parse_model_name(model_name)
+    family = row['Classifier']
+    hyperparameters = {key: row[key] for key in row.index if key in [
+        'kernel', 'C', 'gamma', 'degree', 'coef0',
+        'n_estimators', 'max_depth', 'min_samples_split',
+        'min_samples_leaf', 'bootstrap', 'max_features',
+        'criterion', 'class_weight',
+        'n_neighbors', 'weights', 'algorithm', 'metric'
+    ]}
 
-    # Now, generate abbreviation based on classifier
     if family == 'SVC':
-        kernel = hyperparameters.get('kernel', '')
-        C = hyperparameters.get('C', '')
-        if kernel == 'poly':
-            degree = hyperparameters.get('degree', '')
-            abbrev = f"SVC-ply-d{degree}-C{C}"
-        else:
-            abbrev = f"SVC-{kernel[:3]}-C{C}"
+        # Retrieve all relevant hyperparameters
+        kernel = hyperparameters.get('kernel', 'rbf')
+        C = hyperparameters.get('C', '1.0')
+        gamma = hyperparameters.get('gamma', 'scale')
+        degree = hyperparameters.get('degree', '3')
+        coef0 = hyperparameters.get('coef0', '0.0')
+
+        # Shorten some parameter values for brevity
+        kernel_abbr = kernel[:3]
+        gamma_abbr = gamma if gamma in ['scale', 'auto'] else f"g{gamma}"
+        C_abbr = f"C{C}"
+        degree_abbr = f"d{degree}" if kernel == 'poly' else ''
+        coef0_abbr = f"c{coef0}" if kernel in ['poly', 'sigmoid'] else ''
+
+        abbrev = f"SVC-{kernel_abbr}{degree_abbr}{coef0_abbr}-{gamma_abbr}-{C_abbr}"
     elif family == 'RF':
-        n_estimators = hyperparameters.get('n_estimators', '')
-        max_depth = hyperparameters.get('max_depth', '')
-        abbrev = f"RF-n{n_estimators}-d{max_depth}"
+        # Retrieve all relevant hyperparameters
+        n_estimators = hyperparameters.get('n_estimators', '100')
+        max_depth = hyperparameters.get('max_depth', 'None')
+        min_samples_split = hyperparameters.get('min_samples_split', '2')
+        min_samples_leaf = hyperparameters.get('min_samples_leaf', '1')
+        bootstrap = hyperparameters.get('bootstrap', 'True')
+        max_features = hyperparameters.get('max_features', 'auto')
+        criterion = hyperparameters.get('criterion', 'gini')
+        class_weight = hyperparameters.get('class_weight', 'None')
+
+        # Abbreviate certain hyperparameter values
+        criterion_abbr = {'gini': 'g', 'entropy': 'e'}.get(str(criterion), str(criterion)[:1])
+        max_features_abbr = {'sqrt': 'sq', 'log2': 'l2', 'auto': 'au'}.get(str(max_features), str(max_features)[:2])
+        bootstrap_abbr = 'b' if str(bootstrap) == 'True' else 'nb'
+        class_weight_abbr = {'balanced': 'b', 'balanced_subsample': 'bs'}.get(str(class_weight), 'n')
+
+        abbrev = (f"RF-n{n_estimators}-d{max_depth}-s{min_samples_split}-l{min_samples_leaf}-"
+                  f"c{criterion_abbr}-mf{max_features_abbr}-{bootstrap_abbr}-cw{class_weight_abbr}")
     elif family == 'KNN':
-        positional_params = hyperparameters.get('positional', [])
-        if len(positional_params) >= 3:
-            weights = positional_params[0][:1]  # First letter of weights
-            algorithm = positional_params[1][:1]  # First letter of algorithm
-            metric = positional_params[2][:1]  # First letter of metric
-            k = hyperparameters.get('k', '')
-            abbrev = f"KNN-{weights}{algorithm}{metric}-k{k}"
-        else:
-            abbrev = family
+        # Retrieve all relevant hyperparameters
+        n_neighbors = hyperparameters.get('n_neighbors', '5')
+        weights = hyperparameters.get('weights', 'uniform')
+        algorithm = hyperparameters.get('algorithm', 'auto')
+        metric = hyperparameters.get('metric', 'minkowski')
+
+        # Abbreviate certain hyperparameter values
+        weights_abbr = {'uniform': 'u', 'distance': 'd'}.get(str(weights), str(weights)[:1])
+        algorithm_abbr = {'ball_tree': 'bt', 'kd_tree': 'kd', 'brute': 'br', 'auto': 'au'}.get(str(algorithm), str(algorithm)[:2])
+        metric_abbr = {'euclidean': 'euc', 'cityblock': 'cit', 'manhattan': 'man'}.get(str(metric), str(metric)[:3])
+
+        abbrev = f"KNN-{weights_abbr}{algorithm_abbr}{metric_abbr}-k{n_neighbors}"
     else:
         abbrev = family
     return abbrev
@@ -89,13 +108,31 @@ def collect_holdout_data(root_dir):
             if os.path.exists(metrics_file):
                 try:
                     metrics = load_metrics(metrics_file)
-                    family, hyperparams = parse_model_name(model_folder)
+                    family = parse_model_name(model_folder)
+                    # Get hyperparameters from model_params
+                    model_params = metrics.get('model_params', {})
+                    # Define the hyperparameters that were changed during experiments
+                    if family == 'SVC':
+                        changed_hyperparams = ['kernel', 'C', 'gamma', 'degree', 'coef0']
+                    elif family == 'RF':
+                        changed_hyperparams = ['n_estimators', 'max_depth', 'min_samples_split', 'min_samples_leaf',
+                                               'bootstrap', 'max_features', 'criterion', 'class_weight']
+                    elif family == 'KNN':
+                        changed_hyperparams = ['n_neighbors', 'weights', 'algorithm', 'metric']
+                    else:
+                        changed_hyperparams = []
+                    # Extract the values of the changed hyperparameters from model_params
+                    hyperparameters = {param: model_params.get(param, None) for param in changed_hyperparams}
+                    # Convert boolean values to strings
+                    for key, value in hyperparameters.items():
+                        if isinstance(value, bool):
+                            hyperparameters[key] = str(value)
                     entry = {
                         'Method': 'Holdout',
                         'Dataset': dataset,
                         'Classifier': family,
                         'Model_Name': model_folder,  # Include the full model name
-                        'Hyperparameters': hyperparams,
+                        'Hyperparameters': hyperparameters,
                         'Accuracy': metrics['accuracy'],
                         'F1_Score': metrics['classification_report']['weighted avg']['f1-score'],
                         'Elapsed_Time': metrics['elapsed_time_seconds'],
@@ -132,13 +169,31 @@ def collect_crossval_data(root_dir):
                 f1_scores = np.mean([f['classification_report']['weighted avg']['f1-score'] for f in folds])
                 elapsed_time = np.mean([f['elapsed_time_seconds'] for f in folds])
                 memory_usage = np.mean([f['peak_memory_usage_mb'] for f in folds])
-                family, hyperparams = parse_model_name(model_folder)
+                family = parse_model_name(model_folder)
+                # Get hyperparameters from model_params
+                model_params = folds[0].get('model_params', {})
+                # Define the hyperparameters that were changed during experiments
+                if family == 'SVC':
+                    changed_hyperparams = ['kernel', 'C', 'gamma', 'degree', 'coef0']
+                elif family == 'RF':
+                    changed_hyperparams = ['n_estimators', 'max_depth', 'min_samples_split', 'min_samples_leaf',
+                                           'bootstrap', 'max_features', 'criterion', 'class_weight']
+                elif family == 'KNN':
+                    changed_hyperparams = ['n_neighbors', 'weights', 'algorithm', 'metric']
+                else:
+                    changed_hyperparams = []
+                # Extract the values of the changed hyperparameters from model_params
+                hyperparameters = {param: model_params.get(param, None) for param in changed_hyperparams}
+                # Convert boolean values to strings
+                for key, value in hyperparameters.items():
+                    if isinstance(value, bool):
+                        hyperparameters[key] = str(value)
                 entry = {
                     'Method': 'Cross-Validation',
                     'Dataset': dataset,
                     'Classifier': family,
                     'Model_Name': model_folder,  # Include the full model name
-                    'Hyperparameters': hyperparams,
+                    'Hyperparameters': hyperparameters,
                     'Accuracy': accuracy,
                     'F1_Score': f1_scores,
                     'Elapsed_Time': elapsed_time,
@@ -172,7 +227,7 @@ if __name__ == "__main__":
     df.fillna(method='ffill', inplace=True)
 
     # Generate abbreviated model names
-    df['Abbrev_Model_Name'] = df['Model_Name'].apply(generate_abbreviated_model_name)
+    df['Abbrev_Model_Name'] = df.apply(generate_abbreviated_model_name, axis=1)
 
     # Group by Method, Dataset, Classifier
     summary = df.groupby(['Method', 'Dataset', 'Classifier']).agg(
@@ -255,7 +310,7 @@ if __name__ == "__main__":
     # Export summary table to CSV
     summary.to_csv('classifier_family_summary.csv', index=False)
 
-    # Plot 1: Box Plot of Accuracy by Classifier Family
+    # Plot 5: Box Plot of Accuracy by Classifier Family
     plt.figure(figsize=(12, 6))
     sns.boxplot(x='Classifier', y='Accuracy', hue='Method', data=df)
     plt.title('Accuracy by Classifier Family and Method')
@@ -267,7 +322,7 @@ if __name__ == "__main__":
     plt.savefig(os.path.join(output_plot_dir, 'accuracy_classifier_family_boxplot.png'))
     plt.show()
 
-    # Plot 2: F1-Score vs. Elapsed Time by Classifier Family
+    # Plot 6: F1-Score vs. Elapsed Time by Classifier Family
     plt.figure(figsize=(10, 6))
     sns.scatterplot(x='Elapsed_Time', y='F1_Score', hue='Classifier', style='Method', data=df)
     plt.title('F1-Score vs. Elapsed Time by Classifier Family')
@@ -283,18 +338,26 @@ if __name__ == "__main__":
     best_models.to_latex('best_models.tex', index=False)
 
     # Additional Plot: Bar charts of top 3 and bottom 3 models per classifier family per dataset
+    # Filter the DataFrame to only include holdout results
+    df_holdout = df[df['Method'] == 'Holdout']
+
     # Get list of datasets
-    datasets = df['Dataset'].unique()
+    datasets = df_holdout['Dataset'].unique()
     datasets.sort()
 
-    # Create 2x2 subplot grid
-    fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+    # Determine the grid size based on the number of datasets
+    num_datasets = len(datasets)
+    num_cols = 2  # Adjust as needed
+    num_rows = (num_datasets + num_cols - 1) // num_cols
+
+    # Create subplot grid dynamically based on the number of datasets
+    fig, axs = plt.subplots(num_rows, num_cols, figsize=(15, 5 * num_rows))
 
     classifier_families = ['KNN', 'RF', 'SVC']
 
     for idx, dataset in enumerate(datasets):
         ax = axs.flatten()[idx]
-        data = df[df['Dataset'] == dataset]
+        data = df_holdout[df_holdout['Dataset'] == dataset]
         selected_models = pd.DataFrame()
 
         # Define color palettes for each classifier family
@@ -317,24 +380,33 @@ if __name__ == "__main__":
             selected = pd.concat([bottom3, top3])
             selected = selected.copy().reset_index(drop=True)
             # Assign colors
-            selected['Color'] = color_palettes[clf]
-            # Use abbreviated model names
+            selected['Color'] = color_palettes[clf][:len(selected)]
+            # Collect selected models
             selected_models = pd.concat([selected_models, selected])
 
-        # Now plot
+        # Check if selected_models is empty
+        if selected_models.empty:
+            continue
+
         # Sort selected_models by F1_Score
         selected_models = selected_models.sort_values('F1_Score').reset_index(drop=True)
 
         x = np.arange(len(selected_models))
         y = selected_models['F1_Score']
         colors = selected_models['Color']
+        # Use abbreviated model names as labels
         labels = selected_models['Abbrev_Model_Name']
 
         ax.bar(x, y, color=colors)
         ax.set_title(f'Dataset: {dataset}')
         ax.set_xticks(x)
-        ax.set_xticklabels(labels, rotation=90)
-        ax.set_ylabel('F1_Score')
+        ax.set_xticklabels(labels, rotation=45, ha="right")
+        ax.set_ylabel('F1 Score')
+
+    # Remove empty subplots if any
+    if num_datasets < num_rows * num_cols:
+        for idx in range(num_datasets, num_rows * num_cols):
+            fig.delaxes(axs.flatten()[idx])
 
     # Adjust layout and save figure
     plt.tight_layout()

@@ -147,7 +147,7 @@ def plot_metrics(df):
                        'weighted avg_recall', 'weighted avg_f1-score']
     
     # Create output directory for plots
-    plots_dir = os.path.join('output_results', 'visualisations')
+    plots_dir = os.path.join('output_results_holdout', 'visualisations')
     os.makedirs(plots_dir, exist_ok=True)
     
     # Set seaborn style
@@ -218,7 +218,7 @@ def generate_decision_boundary_plots(models, X, y, dataset_name):
     from sklearn.inspection import DecisionBoundaryDisplay
 
     # Create output directory for decision boundary plots
-    plots_dir = os.path.join('output_results', 'visualisations', 'decision_boundaries')
+    plots_dir = os.path.join('output_results_holdout', 'visualisations', 'decision_boundaries')
     os.makedirs(plots_dir, exist_ok=True)
 
     # Sample data to reduce computation time
@@ -278,7 +278,7 @@ def generate_decision_boundary_plots(models, X, y, dataset_name):
 
 
 def main():
-    output_dir = 'output_results'
+    output_dir = 'output_results_holdout'
     # Collect metrics from JSON files
     df = collect_metrics(output_dir)
     if df.empty:

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Define the datasets, models, and evaluation methods
 datasets=("wine_reviews" "amazon_reviews" "congressional_voting" "traffic_prediction")
 models=("rf" "svm" "knn")
@@ -19,5 +18,6 @@ done
 
 # Run the visualization script after all experiments are completed
 python src/evaluation/visualisation.py
+python src/evaluation/process_results.py
 echo "Visualization saved"
 echo "All experiments completed."
