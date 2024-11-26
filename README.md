@@ -63,7 +63,7 @@ Supported evaluation methods:
 - **Performance Metrics**: Measure and report execution time and memory usage.
 
 ## Repository Structure
-
+```
 ds-ml-project/
 ├── data/
 │ ├── raw/
@@ -90,7 +90,7 @@ ds-ml-project/
 │ ├── random_forest.py
 │ └── svm.py
 └── README.md
-
+```
 
 
 - **data/**: Contains raw and processed datasets.
